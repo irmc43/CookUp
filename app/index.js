@@ -15,6 +15,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
+
 const AuthScreen = ({ email, setEmail, password, setPassword, isLogin, setIsLogin, handleAuthentication }) => {
   return (
     <View style={styles.authContainer}>
@@ -59,7 +60,7 @@ const AuthenticatedScreen = ({ user, handleAuthentication }) => {
     </View>
   );
 };
-export default Login = () => {
+export default App = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null); // Track user authentication state
