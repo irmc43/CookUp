@@ -3,6 +3,13 @@ Mobile Computing - CookUp
 
 Node Version: 20.18.0
 
+Anleitung lokale Installation:
+1. main Branch herunterladen
+2. Terminal öffnen
+3. In den CookUp Ordner wechseln
+4. npm install ausführen
+5. npx expo start ausführen für das Starten der App
+
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
