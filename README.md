@@ -1,6 +1,7 @@
 # CookUp
 Mobile Computing - CookUp
 
+Node Version: 20.18.0
 
 # Welcome to your Expo app 👋
 
