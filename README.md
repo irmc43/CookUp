@@ -9,6 +9,7 @@ Installierte Libraries:
 - NativeWind
 - HeroIcons
 - react-native-responsive-screen
+- expo image picker
 
 Anleitung lokale Installation:
 1. main Branch herunterladen
