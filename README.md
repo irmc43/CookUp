@@ -12,9 +12,10 @@ Installierte Libraries:
 
 Anleitung lokale Installation:
 1. main Branch herunterladen
-2. Terminal öffnen
-3. In den CookUp Ordner wechseln
-4. "npm install" ausführen, um die node modules zu installieren
+2. Entpacken und heruntergeladenen Ordner in Benutzerordner verschieben
+3. Terminal öffnen
+4. In den CookUp Ordner wechseln
+5. "npm install" ausführen, um die node modules zu installieren
    
     ```bash
    npm install
