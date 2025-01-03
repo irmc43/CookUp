@@ -10,6 +10,7 @@ Installierte Libraries:
 - HeroIcons
 - react-native-responsive-screen
 - expo image picker
+- expo file system
 
 Anleitung lokale Installation:
 1. main Branch herunterladen
