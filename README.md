@@ -11,6 +11,9 @@ Installierte Libraries:
 - react-native-responsive-screen
 - expo image picker
 - expo file system
+- expo camera
+- expo media library
+
 
 Anleitung lokale Installation:
 1. main Branch herunterladen
