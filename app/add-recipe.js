@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert, Image } from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system"; 
+import * as ImagePicker from "expo-image-picker";  // Importiere Expo ImagePicker
 import { getAuth } from "firebase/auth";
-import { db } from "./firebase.config";
+import { db } from "./firebase.config"; // Dein Firebase DB-Import
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 
 export default function AddRecipe() {
@@ -13,7 +12,6 @@ export default function AddRecipe() {
   const [ingredients, setIngredients] = useState([]);
   const [instructions, setInstructions] = useState([]);
   const [imageUri, setImageUri] = useState(null); // Zustand für das Bild
-  const [imageBase64, setImageBase64] = useState(null); // Zustand für Base64 des Bildes
   const [loading, setLoading] = useState(false);
 
   const auth = getAuth();
@@ -21,6 +19,13 @@ export default function AddRecipe() {
 
   // Funktion zum Bild auswählen
   const pickImage = async () => {
+    // Berechtigungen anfordern
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert("Permission to access media library is required!");
+      return;
+    }
+
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -28,20 +33,26 @@ export default function AddRecipe() {
     });
 
     if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
-      convertImageToBase64(result.assets[0].uri); // Bild in Base64 umwandeln
+      setImageUri(result.assets[0].uri); // Setze den URI des Bildes
     }
   };
 
-  // Funktion zum Konvertieren des Bildes in Base64
-  const convertImageToBase64 = async (uri) => {
-    try {
-      const base64 = await FileSystem.readAsStringAsync(uri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-      setImageBase64(base64); // Base64 im Zustand speichern
-    } catch (error) {
-      console.error("Fehler beim Konvertieren des Bildes in Base64:", error);
+  // Funktion zum Foto aufnehmen
+  const takePhoto = async () => {
+    // Berechtigungen anfordern
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert("Permission to access camera is required!");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri); // Setze den URI des aufgenommenen Bildes
     }
   };
 
@@ -71,7 +82,7 @@ export default function AddRecipe() {
         createdAt: Timestamp.now(),
         rating: 0,
         reviewCount: 0,
-        image: imageBase64, // Base64-String des Bildes speichern
+        image: imageUri, // URI des Bildes speichern
       };
 
       // Rezept in Firestore speichern
@@ -95,8 +106,7 @@ export default function AddRecipe() {
     setTimeMinutes("");
     setIngredients([]);
     setInstructions([]);
-    setImageUri(null);
-    setImageBase64(null); // Base64 zurücksetzen
+    setImageUri(null); // Bild-URI zurücksetzen
   };
 
   return (
@@ -138,6 +148,9 @@ export default function AddRecipe() {
 
       {/* Bild auswählen */}
       <Button title="Bild auswählen" onPress={pickImage} />
+      {/* Foto aufnehmen */}
+      <Button title="Foto aufnehmen" onPress={takePhoto} />
+      
       {imageUri && <Image source={{ uri: imageUri }} style={styles.imagePreview} />}
 
       <Button
@@ -152,6 +165,7 @@ export default function AddRecipe() {
 
 const styles = StyleSheet.create({
   container: {
+    marginTop:78,
     padding: 16,
     backgroundColor: "#f0f0f0",
     alignItems: "center",
@@ -177,6 +191,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 });
+
 
 
 
