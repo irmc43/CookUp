@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert, Image } from "react-native";
 import * as ImagePicker from "expo-image-picker";  // Importiere Expo ImagePicker
 import { getAuth } from "firebase/auth";
-import { db } from "./firebase.config"; // Dein Firebase DB-Import
+import { firestore } from "./firebase.config"; // Dein Firebase DB-Import
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 
 export default function AddRecipe() {
@@ -86,7 +86,7 @@ export default function AddRecipe() {
       };
 
       // Rezept in Firestore speichern
-      const recipeRef = collection(db, "communityRecipes");
+      const recipeRef = collection(firestore, "communityRecipes");
       await addDoc(recipeRef, newRecipe);
 
       Alert.alert("Erfolg", "Rezept wurde erfolgreich hinzugefügt!");
