@@ -105,7 +105,6 @@ export default function Home({ navigation }) {
           <TouchableOpacity
             key={cuisine}
             style={styles.categoryButton}
-            onPress={() => navigation.navigate('CategoryRecipes', { category: cuisine })}
           >
             <Text style={styles.categoryText}>{cuisine}</Text>
           </TouchableOpacity>
