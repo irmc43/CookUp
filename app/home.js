@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Image, StyleSheet, ActivityIndicator, Dimensions, FlatList, TouchableOpacity, ScrollView } from "react-native";
-import { getAuth, signOut } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { ref, onValue } from "firebase/database";
 import { collection, getDocs } from "firebase/firestore";
 import { db, firestore } from "./firebase.config";
+import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get('window');
 
-export default function Home({ navigation }) {
+export default function Home() {
   const [myRecipes, setMyRecipes] = useState([]);
   const [communityRecipes, setCommunityRecipes] = useState([]);
   const [loadingMyRecipes, setLoadingMyRecipes] = useState(true);
   const [loadingCommunityRecipes, setLoadingCommunityRecipes] = useState(true);
+  const router = useRouter();
 
   // Eigene Rezepte aus der Realtime Database laden
   useEffect(() => {
@@ -78,9 +80,22 @@ export default function Home({ navigation }) {
   const allRecipes = [...myRecipes, ...communityRecipes];
   const cuisines = [...new Set(allRecipes.map(recipe => recipe.cuisine))];
 
+  // Funktion zur Navigation zum Profil-Screen
+  const navigateToProfile = () => {
+    router.push("/profile"); // Navigiert zum Profil-Screen
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Hallo,</Text>
+      <Text style={styles.title}>Hallo,
+        {/* Button zum Profil */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.profileButton} onPress={navigateToProfile}>
+          <Text style={styles.profileButtonText}>Zum Profil</Text>
+        </TouchableOpacity>
+      </View>
+      </Text>
+
       <Text style={styles.title}>Unsere Rezepte</Text>
       {myRecipes.length > 0 ? (
         <FlatList
@@ -98,7 +113,7 @@ export default function Home({ navigation }) {
       <Text style={styles.title}>Kategorien</Text>
       <ScrollView
         horizontal={true}
-        showsHorizontalScrollIndicator={false} //Verstecke die horizontale Scroll-Leiste
+        showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.categoriesContainer}
       >
         {cuisines.map((cuisine) => (
@@ -133,7 +148,6 @@ const styles = StyleSheet.create({
     marginTop: 78,
     flex: 1,
     padding: 16,
-    //backgroundColor: "#fff",
   },
   title: {
     fontSize: 24,
@@ -194,7 +208,21 @@ const styles = StyleSheet.create({
     color: "#999",
     marginTop: 16,
   },
+  buttonContainer: {
+    marginTop: 20,
+    alignItems: "center",
+  },
+  profileButton: {
+    backgroundColor: "#3498db",
+    padding: 10,
+    borderRadius: 8,
+  },
+  profileButtonText: {
+    fontSize: 18,
+    color: "#fff",
+  },
 });
+
 
 
 
