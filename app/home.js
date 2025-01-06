@@ -85,6 +85,10 @@ export default function Home() {
     router.push("/profile"); // Navigiert zum Profil-Screen
   };
 
+  const navigateToAddRecipe = () => {
+    router.push("/add-recipe"); 
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Hallo,
@@ -92,6 +96,9 @@ export default function Home() {
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.profileButton} onPress={navigateToProfile}>
           <Text style={styles.profileButtonText}>Zum Profil</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.profileButton} onPress={navigateToAddRecipe}>
+          <Text style={styles.profileButtonText}>Rezept hinzufügen</Text>
         </TouchableOpacity>
       </View>
       </Text>
