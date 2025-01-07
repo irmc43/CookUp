@@ -1,3 +1,4 @@
+// firebase.config.js
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getDatabase } from "firebase/database";
@@ -13,8 +14,10 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
 const db = getDatabase(app); //Realtime Database
 const firestore = getFirestore(app); //Firestore
 
+
 export { app, db, firestore };
+
+export default { app, db, firestore };

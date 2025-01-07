@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert, Image } from "react-native";
-import * as ImagePicker from "expo-image-picker";  // Importiere Expo ImagePicker
+import * as ImagePicker from "expo-image-picker";
 import { getAuth } from "firebase/auth";
-import { firestore } from "./firebase.config"; // Dein Firebase DB-Import
+import { firestore } from "./firebase.config";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 
 export default function AddRecipe() {
@@ -11,7 +11,7 @@ export default function AddRecipe() {
   const [timeMinutes, setTimeMinutes] = useState("");
   const [ingredients, setIngredients] = useState([]);
   const [instructions, setInstructions] = useState([]);
-  const [imageUri, setImageUri] = useState(null); // Zustand für das Bild
+  const [imageUri, setImageUri] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const auth = getAuth();
@@ -82,7 +82,7 @@ export default function AddRecipe() {
         createdAt: Timestamp.now(),
         rating: 0,
         reviewCount: 0,
-        image: imageUri, // URI des Bildes speichern
+        image: imageUri,
       };
 
       // Rezept in Firestore speichern
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ddd",
     borderRadius: 5,
-    backgroundColor: "#fff",
+    backgroundColor: "#fefefe",
   },
   imagePreview: {
     width: 100,

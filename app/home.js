@@ -5,6 +5,7 @@ import { ref, onValue } from "firebase/database";
 import { collection, getDocs } from "firebase/firestore";
 import { db, firestore } from "./firebase.config";
 import { useRouter } from "expo-router";
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const { width } = Dimensions.get('window');
 
@@ -14,6 +15,7 @@ export default function Home() {
   const [loadingMyRecipes, setLoadingMyRecipes] = useState(true);
   const [loadingCommunityRecipes, setLoadingCommunityRecipes] = useState(true);
   const router = useRouter();
+  
 
   // Eigene Rezepte aus der Realtime Database laden
   useEffect(() => {
@@ -63,7 +65,7 @@ export default function Home() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#3498db" />
-        <Text>Rezepte werden geladen...</Text>
+        <Text>wird geladen...</Text>
       </View>
     );
   }
@@ -72,11 +74,18 @@ export default function Home() {
     <View style={styles.carouselItem}>
       <Image source={{ uri: item.image }} style={styles.recipeImage} />
       <Text style={styles.recipeTitle}>{item.name}</Text>
-      <Text style={styles.recipeTime}>Dauer: {item.timeMinutes} Minuten</Text>
+      <View style={styles.timeContainer}>
+        <Icon name="access-time" size={20} color="#000" />
+        <View style={styles.recipeTimeContainer}>
+          <Text style={styles.recipeTime}>{item.timeMinutes} Minuten</Text>
+        </View>
+      </View>
     </View>
   );
+  
+  
 
-  // Erstelle eine Liste von Kategorien basierend auf den Rezepten
+  // Kategorien nach Küche
   const allRecipes = [...myRecipes, ...communityRecipes];
   const cuisines = [...new Set(allRecipes.map(recipe => recipe.cuisine))];
 
@@ -104,9 +113,9 @@ export default function Home() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.categoriesContainer}
       >
-        {cuisines.map((cuisine) => (
+        {cuisines.map((cuisine, index) => (
           <TouchableOpacity
-            key={cuisine}
+            key={`${cuisine}-${index}`} // Key durch Kombination aus `cuisine` und `index`
             style={styles.categoryButton}
           >
             <Text style={styles.categoryText}>{cuisine}</Text>
@@ -169,7 +178,12 @@ const styles = StyleSheet.create({
   recipeTime: {
     fontSize: 16,
     color: "#555",
-    marginTop: 4,
+    marginLeft: 5, // Abstand zwischen Icon und Text
+  },
+  timeContainer: {
+    flexDirection: "row", // Elemente nebeneinander
+    alignItems: "center", // Vertikale Ausrichtung in der Mitte
+    marginTop: 5, // Abstand nach oben
   },
   categoriesContainer: {
     flexDirection: "row",
@@ -210,6 +224,9 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
 });
+
+
+
 
 
 
