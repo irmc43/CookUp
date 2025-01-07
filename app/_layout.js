@@ -15,10 +15,9 @@ export default function Layout() {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Slot /> {/*Hier wird Inhalt der jeweiligen Seite eingefügt*/}
+        <Slot /> 
       </View>
 
-      {/* Navigationsleiste anzeigen, außer auf der Login-Seite */}
       {!isLoginPage && (
         <View style={styles.navBar}>
           <TouchableOpacity onPress={() => router.push('/home')} style={styles.navButton}>
