@@ -80,28 +80,9 @@ export default function Home() {
   const allRecipes = [...myRecipes, ...communityRecipes];
   const cuisines = [...new Set(allRecipes.map(recipe => recipe.cuisine))];
 
-  // Funktion zur Navigation zum Profil-Screen
-  const navigateToProfile = () => {
-    router.push("/profile"); // Navigiert zum Profil-Screen
-  };
-
-  const navigateToAddRecipe = () => {
-    router.push("/add-recipe"); 
-  };
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Hallo,
-        {/* Button zum Profil */}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.profileButton} onPress={navigateToProfile}>
-          <Text style={styles.profileButtonText}>Zum Profil</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.profileButton} onPress={navigateToAddRecipe}>
-          <Text style={styles.profileButtonText}>Rezept hinzufügen</Text>
-        </TouchableOpacity>
-      </View>
-      </Text>
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>Hallo,</Text>
 
       <Text style={styles.title}>Unsere Rezepte</Text>
       {myRecipes.length > 0 ? (
@@ -146,7 +127,7 @@ export default function Home() {
       ) : (
         <Text style={styles.noRecipesText}>Keine Community-Rezepte gefunden.</Text>
       )}
-    </View>
+    </ScrollView>
   );
 }
 

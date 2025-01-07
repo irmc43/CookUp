@@ -167,7 +167,6 @@ const styles = StyleSheet.create({
   container: {
     marginTop:78,
     padding: 16,
-    backgroundColor: "#f0f0f0",
     alignItems: "center",
   },
   title: {
