@@ -27,7 +27,7 @@ export default function AddRecipe() {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaType,
       allowsEditing: true,
       quality: 1,
     });
@@ -184,6 +184,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#fefefe",
   },
   imagePreview: {
+    width: 100,
+    height: 100,
+    marginVertical: 10,
+    borderRadius: 10,
+  },
+  Button: {
     width: 100,
     height: 100,
     marginVertical: 10,

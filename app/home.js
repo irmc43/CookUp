@@ -142,7 +142,7 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 78,
+    marginTop: 40,
     flex: 1,
     padding: 16,
   },
