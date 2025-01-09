@@ -70,18 +70,20 @@ export default function Home() {
     );
   }
 
+
   const renderRecipeItem = ({ item }) => (
+
+    <TouchableOpacity
+    onPress={() => router.push({ pathname: `/recipe-detail`, params: { recipe: JSON.stringify(item) } })}
+    >
     <View style={styles.carouselItem}>
       <Image source={{ uri: item.image }} style={styles.recipeImage} />
       <Text style={styles.recipeTitle}>{item.name}</Text>
-      <View style={styles.timeContainer}>
-        <Icon name="access-time" size={20} color="#000" />
-        <View style={styles.recipeTimeContainer}>
-          <Text style={styles.recipeTime}>{item.timeMinutes} Minuten</Text>
-        </View>
-      </View>
     </View>
-  );
+  </TouchableOpacity>
+
+  
+); 
   
   
 
