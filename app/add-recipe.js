@@ -5,12 +5,12 @@ import {
   TextInput,
   Button,
   StyleSheet,
-  ScrollView,
+  FlatList,
   Alert,
   Image,
-  Picker,
   TouchableOpacity,
 } from "react-native";
+import DropDownPicker from "react-native-dropdown-picker";
 import * as ImagePicker from "expo-image-picker";
 import { getAuth } from "firebase/auth";
 import { firestore } from "./firebase.config";
@@ -28,13 +28,19 @@ export default function AddRecipe() {
   const [instructionInput, setInstructionInput] = useState("");
   const [imageUri, setImageUri] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [items] = useState([
+    { label: "Einfach", value: "Einfach" },
+    { label: "Mittel", value: "Mittel" },
+    { label: "Schwierig", value: "Schwierig" },
+  ]);
 
   const auth = getAuth();
   const user = auth.currentUser;
 
   const pickImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permissionResult.granted === false) {
+    if (!permissionResult.granted) {
       alert("Permission to access media library is required!");
       return;
     }
@@ -52,7 +58,7 @@ export default function AddRecipe() {
 
   const takePhoto = async () => {
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-    if (permissionResult.granted === false) {
+    if (!permissionResult.granted) {
       alert("Permission to access camera is required!");
       return;
     }
@@ -143,7 +149,7 @@ export default function AddRecipe() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.title}>Rezept hinzufügen</Text>
 
       <TextInput
@@ -154,15 +160,15 @@ export default function AddRecipe() {
       />
 
       <Text style={styles.label}>Schwierigkeitsgrad:</Text>
-      <Picker
-        selectedValue={difficulty}
-        onValueChange={(itemValue) => setDifficulty(itemValue)}
+      <DropDownPicker
+        open={open}
+        value={difficulty}
+        items={items}
+        setOpen={setOpen}
+        setValue={setDifficulty}
         style={styles.picker}
-      >
-        <Picker.Item label="Einfach" value="Einfach" />
-        <Picker.Item label="Mittel" value="Mittel" />
-        <Picker.Item label="Schwierig" value="Schwierig" />
-      </Picker>
+        placeholder="Wählen Sie eine Option"
+      />
 
       <TextInput
         style={styles.input}
@@ -188,18 +194,20 @@ export default function AddRecipe() {
       </View>
       <Button title="Zutat hinzufügen" onPress={handleAddIngredient} />
 
-      <View style={styles.listContainer}>
-        {ingredients.map((ingredient, index) => (
-          <View key={index} style={styles.listItemContainer}>
+      <FlatList
+        data={ingredients}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item, index }) => (
+          <View style={styles.listItemContainer}>
             <Text style={styles.listItem}>
-              {ingredient.amount} {ingredient.name}
+              {item.amount} {item.name}
             </Text>
             <TouchableOpacity onPress={() => removeIngredient(index)}>
               <Icon name="close" size={24} color="#e74c3c" />
             </TouchableOpacity>
           </View>
-        ))}
-      </View>
+        )}
+      />
 
       <TextInput
         style={styles.input}
@@ -209,16 +217,18 @@ export default function AddRecipe() {
       />
       <Button title="Anweisung hinzufügen" onPress={handleAddInstruction} />
 
-      <View style={styles.listContainer}>
-        {instructions.map((instruction, index) => (
-          <View key={index} style={styles.listItemContainer}>
-            <Text style={styles.listItem}>{instruction}</Text>
+      <FlatList
+        data={instructions}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item, index }) => (
+          <View style={styles.listItemContainer}>
+            <Text style={styles.listItem}>{item}</Text>
             <TouchableOpacity onPress={() => removeInstruction(index)}>
               <Icon name="close" size={24} color="#e74c3c" />
             </TouchableOpacity>
           </View>
-        ))}
-      </View>
+        )}
+      />
 
       <Button title="Bild auswählen" onPress={pickImage} />
       <Button title="Foto aufnehmen" onPress={takePhoto} />
@@ -231,7 +241,7 @@ export default function AddRecipe() {
         disabled={loading}
         color="#3498db"
       />
-    </ScrollView>
+    </View>
   );
 }
 
@@ -239,7 +249,7 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 40,
     padding: 16,
-    alignItems: "center",
+    flex: 1,
   },
   title: {
     fontSize: 24,
@@ -255,19 +265,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: "#fefefe",
   },
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
   picker: {
-    width: "100%",
-    height: 50,
     marginBottom: 10,
-  },
-  listContainer: {
-    width: "100%",
-    marginBottom: 16,
   },
   listItemContainer: {
     flexDirection: "row",
