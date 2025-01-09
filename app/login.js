@@ -66,7 +66,7 @@ const AuthScreen = ({
 export default function App() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [username, setUsername] = useState(""); // Zustand für Benutzernamen
+  const [username, setUsername] = useState("");
   const [user, setUser] = useState(null);
   const [isLogin, setIsLogin] = useState(true);
   const router = useRouter();
@@ -94,7 +94,7 @@ export default function App() {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         console.log("User created successfully!");
 
-        // Speichere den Benutzernamen in Firestore
+        // Speichern des Benutzernamens in Firestore
         const userId = userCredential.user.uid;
         await setDoc(doc(firestore, "users", userId), {
           username,

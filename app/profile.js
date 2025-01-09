@@ -14,7 +14,7 @@ export default function Profile() {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
       if (!user) {
-        router.replace("/login"); // Weiterleitung zur Login-Seite, falls der Benutzer nicht eingeloggt ist
+        router.replace("/login");
       }
     });
 

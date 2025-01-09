@@ -15,7 +15,7 @@ import * as ImagePicker from "expo-image-picker";
 import { getAuth } from "firebase/auth";
 import { firestore } from "./firebase.config";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
-import Icon from "react-native-vector-icons/MaterialIcons"; // Icons importieren
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 export default function AddRecipe() {
   const [name, setName] = useState("");

@@ -34,11 +34,43 @@ export default function Home() {
   const [favorites, setFavorites] = useState([]);
   const [loadingMyRecipes, setLoadingMyRecipes] = useState(true);
   const [loadingCommunityRecipes, setLoadingCommunityRecipes] = useState(true);
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [userName, setUserName] = useState("Gast");
+
   const router = useRouter();
   const auth = getAuth();
   const user = auth.currentUser;
 
-  // Eigene Rezepte aus der Realtime Database laden
+  // Benutzerdetails laden
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        if (user) {
+          const userDocRef = doc(firestore, "users", user.uid);
+          const userDoc = await getDoc(userDocRef);
+
+          if (userDoc.exists() && userDoc.data().username) {
+            setUserName(userDoc.data().username); // Benutzername aus Firestore setzen
+          } else {
+            console.warn("Kein Benutzername in Firestore gefunden.");
+            setUserName("Gast");
+          }
+        } else {
+          console.warn("Kein angemeldeter Benutzer gefunden.");
+          setUserName("Gast");
+        }
+      } catch (error) {
+        console.error("Fehler beim Abrufen des Benutzernamens:", error);
+        setUserName("Gast");
+      } finally {
+        setLoadingUser(false);
+      }
+    };
+
+    fetchUserName();
+  }, [user]);
+
+  // Eigene Rezepte
   useEffect(() => {
     const recipesRef = ref(db, "recipes");
     onValue(
@@ -63,7 +95,7 @@ export default function Home() {
     );
   }, []);
 
-  // Community-Rezepte aus Firestore laden
+  // Community-Rezepte
   useEffect(() => {
     const fetchCommunityRecipes = async () => {
       try {
@@ -85,7 +117,7 @@ export default function Home() {
     fetchCommunityRecipes();
   }, []);
 
-  // Favoriten des Benutzers laden
+  // Favoriten des Benutzers
   useEffect(() => {
     const fetchFavorites = async () => {
       if (user) {
@@ -125,7 +157,7 @@ export default function Home() {
     }
   };
 
-  if (loadingMyRecipes || loadingCommunityRecipes) {
+  if (loadingMyRecipes || loadingCommunityRecipes || loadingUser) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#3498db" />
@@ -166,7 +198,7 @@ export default function Home() {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Hallo, {user ? user.displayName : "Gast"}</Text>
+      <Text style={styles.title}>Hallo, {userName}</Text>
 
       <Text style={styles.title}>Unsere Rezepte</Text>
       {myRecipes.length > 0 ? (
@@ -262,10 +294,11 @@ const styles = StyleSheet.create({
     top: 20,
     right: 20,
     backgroundColor: "#fff",
-    borderRadius  : 10,
+    borderRadius: 10,
     padding: 4,
   },
 });
+
 
 
 

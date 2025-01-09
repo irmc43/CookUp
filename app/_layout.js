@@ -7,9 +7,8 @@ import Icon3 from 'react-native-vector-icons/MaterialIcons';
 
 export default function Layout() {
   const router = useRouter();
-  const segments = useSegments(); // Ermittelt die aktuelle Route
+  const segments = useSegments();
 
-  // Überprüfen, ob die aktuelle Seite `login` ist
   const isLoginPage = segments[0] === "login";
 
   return (

@@ -155,7 +155,6 @@ export default function RecipeDetail() {
           Zubereitungszeit: {recipeData.timeMinutes} Minuten
         </Text>
 
-        {/* Favoriten-Button mit Herz-Icon */}
         <TouchableOpacity style={styles.favoriteButton} onPress={toggleFavorite}>
           <Icon
             name={isFavorite ? "favorite" : "favorite-border"}
@@ -179,7 +178,7 @@ export default function RecipeDetail() {
                 style={styles.checkbox}
               />
               <Text style={styles.text}>
-                {ingredient.amount} {ingredient.name} {/* Menge und Name anzeigen */}
+                {ingredient.amount} {ingredient.name}
               </Text>
             </View>
           ))
