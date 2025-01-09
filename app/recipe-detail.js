@@ -178,7 +178,9 @@ export default function RecipeDetail() {
                 onValueChange={() => handleCheckIngredient(ingredient)}
                 style={styles.checkbox}
               />
-              <Text style={styles.text}>{ingredient}</Text>
+              <Text style={styles.text}>
+                {ingredient.amount} {ingredient.name} {/* Menge und Name anzeigen */}
+              </Text>
             </View>
           ))
         ) : (
@@ -315,6 +317,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
 });
+
 
 
 

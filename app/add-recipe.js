@@ -1,25 +1,38 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert, Image } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  Image,
+  Picker,
+  TouchableOpacity,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { getAuth } from "firebase/auth";
 import { firestore } from "./firebase.config";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
+import Icon from "react-native-vector-icons/MaterialIcons"; // Icons importieren
 
 export default function AddRecipe() {
   const [name, setName] = useState("");
-  const [difficulty, setDifficulty] = useState("");
+  const [difficulty, setDifficulty] = useState("Einfach");
   const [timeMinutes, setTimeMinutes] = useState("");
   const [ingredients, setIngredients] = useState([]);
   const [instructions, setInstructions] = useState([]);
+  const [ingredientName, setIngredientName] = useState("");
+  const [ingredientAmount, setIngredientAmount] = useState("");
+  const [instructionInput, setInstructionInput] = useState("");
   const [imageUri, setImageUri] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const auth = getAuth();
   const user = auth.currentUser;
 
-  // Funktion zum Bild auswählen
   const pickImage = async () => {
-    // Berechtigungen anfordern
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissionResult.granted === false) {
       alert("Permission to access media library is required!");
@@ -33,13 +46,11 @@ export default function AddRecipe() {
     });
 
     if (!result.canceled) {
-      setImageUri(result.assets[0].uri); // Setze den URI des Bildes
+      setImageUri(result.assets[0].uri);
     }
   };
 
-  // Funktion zum Foto aufnehmen
   const takePhoto = async () => {
-    // Berechtigungen anfordern
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
     if (permissionResult.granted === false) {
       alert("Permission to access camera is required!");
@@ -52,11 +63,10 @@ export default function AddRecipe() {
     });
 
     if (!result.canceled) {
-      setImageUri(result.assets[0].uri); // Setze den URI des aufgenommenen Bildes
+      setImageUri(result.assets[0].uri);
     }
   };
 
-  // Funktion zum Hinzufügen eines Rezepts
   const handleAddRecipe = async () => {
     if (!user) {
       Alert.alert("Fehler", "Bitte melden Sie sich an, um ein Rezept hinzuzufügen.");
@@ -71,7 +81,6 @@ export default function AddRecipe() {
     setLoading(true);
 
     try {
-      // Rezeptdaten zusammenstellen
       const newRecipe = {
         name,
         difficulty,
@@ -85,7 +94,6 @@ export default function AddRecipe() {
         image: imageUri,
       };
 
-      // Rezept in Firestore speichern
       const recipeRef = collection(firestore, "communityRecipes");
       await addDoc(recipeRef, newRecipe);
 
@@ -99,14 +107,39 @@ export default function AddRecipe() {
     }
   };
 
-  // Formular zurücksetzen
+  const handleAddIngredient = () => {
+    if (ingredientName.trim() === "" || ingredientAmount.trim() === "") return;
+    setIngredients([...ingredients, { name: ingredientName, amount: ingredientAmount }]);
+    setIngredientName("");
+    setIngredientAmount("");
+  };
+
+  const handleAddInstruction = () => {
+    if (instructionInput.trim() === "") return;
+    setInstructions([...instructions, instructionInput]);
+    setInstructionInput("");
+  };
+
+  const removeIngredient = (index) => {
+    const updatedIngredients = ingredients.filter((_, i) => i !== index);
+    setIngredients(updatedIngredients);
+  };
+
+  const removeInstruction = (index) => {
+    const updatedInstructions = instructions.filter((_, i) => i !== index);
+    setInstructions(updatedInstructions);
+  };
+
   const resetForm = () => {
     setName("");
-    setDifficulty("");
+    setDifficulty("Einfach");
     setTimeMinutes("");
     setIngredients([]);
     setInstructions([]);
-    setImageUri(null); // Bild-URI zurücksetzen
+    setImageUri(null);
+    setIngredientName("");
+    setIngredientAmount("");
+    setInstructionInput("");
   };
 
   return (
@@ -119,12 +152,18 @@ export default function AddRecipe() {
         value={name}
         onChangeText={setName}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Schwierigkeitsgrad (z. B. Einfach, Mittel, Schwer)"
-        value={difficulty}
-        onChangeText={setDifficulty}
-      />
+
+      <Text style={styles.label}>Schwierigkeitsgrad:</Text>
+      <Picker
+        selectedValue={difficulty}
+        onValueChange={(itemValue) => setDifficulty(itemValue)}
+        style={styles.picker}
+      >
+        <Picker.Item label="Einfach" value="Einfach" />
+        <Picker.Item label="Mittel" value="Mittel" />
+        <Picker.Item label="Schwierig" value="Schwierig" />
+      </Picker>
+
       <TextInput
         style={styles.input}
         placeholder="Zubereitungszeit (Minuten)"
@@ -133,24 +172,57 @@ export default function AddRecipe() {
         keyboardType="numeric"
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Zutaten (kommagetrennt)"
-        value={ingredients.join(", ")}
-        onChangeText={(text) => setIngredients(text.split(",").map((item) => item.trim()))}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Anweisungen (kommagetrennt)"
-        value={instructions.join(", ")}
-        onChangeText={(text) => setInstructions(text.split(",").map((item) => item.trim()))}
-      />
+      <View style={styles.ingredientContainer}>
+        <TextInput
+          style={[styles.input, styles.amountInput]}
+          placeholder="Menge (z.B. 200g)"
+          value={ingredientAmount}
+          onChangeText={setIngredientAmount}
+        />
+        <TextInput
+          style={[styles.input, styles.ingredientInput]}
+          placeholder="Zutat (z.B. Zucker)"
+          value={ingredientName}
+          onChangeText={setIngredientName}
+        />
+      </View>
+      <Button title="Zutat hinzufügen" onPress={handleAddIngredient} />
 
-      {/* Bild auswählen */}
+      <View style={styles.listContainer}>
+        {ingredients.map((ingredient, index) => (
+          <View key={index} style={styles.listItemContainer}>
+            <Text style={styles.listItem}>
+              {ingredient.amount} {ingredient.name}
+            </Text>
+            <TouchableOpacity onPress={() => removeIngredient(index)}>
+              <Icon name="close" size={24} color="#e74c3c" />
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Anweisung hinzufügen"
+        value={instructionInput}
+        onChangeText={setInstructionInput}
+      />
+      <Button title="Anweisung hinzufügen" onPress={handleAddInstruction} />
+
+      <View style={styles.listContainer}>
+        {instructions.map((instruction, index) => (
+          <View key={index} style={styles.listItemContainer}>
+            <Text style={styles.listItem}>{instruction}</Text>
+            <TouchableOpacity onPress={() => removeInstruction(index)}>
+              <Icon name="close" size={24} color="#e74c3c" />
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
+
       <Button title="Bild auswählen" onPress={pickImage} />
-      {/* Foto aufnehmen */}
       <Button title="Foto aufnehmen" onPress={takePhoto} />
-      
+
       {imageUri && <Image source={{ uri: imageUri }} style={styles.imagePreview} />}
 
       <Button
@@ -165,7 +237,7 @@ export default function AddRecipe() {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop:78,
+    marginTop: 40,
     padding: 16,
     alignItems: "center",
   },
@@ -183,19 +255,57 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: "#fefefe",
   },
+  label: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  picker: {
+    width: "100%",
+    height: 50,
+    marginBottom: 10,
+  },
+  listContainer: {
+    width: "100%",
+    marginBottom: 16,
+  },
+  listItemContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 4,
+    justifyContent: "space-between",
+  },
+  listItem: {
+    fontSize: 16,
+    color: "#333",
+    marginRight: 8,
+    flex: 1,
+  },
   imagePreview: {
     width: 100,
     height: 100,
     marginVertical: 10,
     borderRadius: 10,
   },
-  Button: {
-    width: 100,
-    height: 100,
-    marginVertical: 10,
-    borderRadius: 10,
+  ingredientContainer: {
+    flexDirection: "row",
+    width: "100%",
+    marginBottom: 10,
+  },
+  ingredientInput: {
+    flex: 2,
+    marginRight: 8,
+  },
+  amountInput: {
+    flex: 1,
   },
 });
+
+
+
+
+
+
 
 
 
