@@ -1,21 +1,42 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, StyleSheet, ActivityIndicator, Dimensions, FlatList, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ActivityIndicator,
+  Dimensions,
+  FlatList,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from "react-native";
 import { getAuth } from "firebase/auth";
 import { ref, onValue } from "firebase/database";
-import { collection, getDocs } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+  getDoc,
+} from "firebase/firestore";
 import { db, firestore } from "./firebase.config";
 import { useRouter } from "expo-router";
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from "react-native-vector-icons/MaterialIcons";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 export default function Home() {
   const [myRecipes, setMyRecipes] = useState([]);
   const [communityRecipes, setCommunityRecipes] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const [loadingMyRecipes, setLoadingMyRecipes] = useState(true);
   const [loadingCommunityRecipes, setLoadingCommunityRecipes] = useState(true);
   const router = useRouter();
-  
+  const auth = getAuth();
+  const user = auth.currentUser;
 
   // Eigene Rezepte aus der Realtime Database laden
   useEffect(() => {
@@ -26,7 +47,8 @@ export default function Home() {
         if (snapshot.exists()) {
           const data = snapshot.val();
           const recipesArray = Object.entries(data).map(([id, recipe]) => ({
-            id, ...recipe
+            id,
+            ...recipe,
           }));
           setMyRecipes(recipesArray);
         } else {
@@ -45,7 +67,9 @@ export default function Home() {
   useEffect(() => {
     const fetchCommunityRecipes = async () => {
       try {
-        const querySnapshot = await getDocs(collection(firestore, "communityRecipes"));
+        const querySnapshot = await getDocs(
+          collection(firestore, "communityRecipes")
+        );
         const recipes = [];
         querySnapshot.forEach((doc) => {
           recipes.push({ id: doc.id, ...doc.data() });
@@ -61,6 +85,46 @@ export default function Home() {
     fetchCommunityRecipes();
   }, []);
 
+  // Favoriten des Benutzers laden
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      if (user) {
+        const userDocRef = doc(firestore, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          setFavorites(userDoc.data().favorites || []);
+        }
+      }
+    };
+
+    fetchFavorites();
+  }, [user]);
+
+  // Favoriten hinzufügen/entfernen
+  const toggleFavorite = async (recipeId) => {
+    if (!user) {
+      Alert.alert(
+        "Anmeldung erforderlich",
+        "Bitte melden Sie sich an, um Favoriten zu speichern."
+      );
+      return;
+    }
+
+    const userDocRef = doc(firestore, "users", user.uid);
+
+    if (favorites.includes(recipeId)) {
+      await updateDoc(userDocRef, {
+        favorites: arrayRemove(recipeId),
+      });
+      setFavorites(favorites.filter((id) => id !== recipeId));
+    } else {
+      await updateDoc(userDocRef, {
+        favorites: arrayUnion(recipeId),
+      });
+      setFavorites([...favorites, recipeId]);
+    }
+  };
+
   if (loadingMyRecipes || loadingCommunityRecipes) {
     return (
       <View style={styles.loadingContainer}>
@@ -70,34 +134,39 @@ export default function Home() {
     );
   }
 
-
   const renderRecipeItem = ({ item }) => (
-
     <TouchableOpacity
-    onPress={() => router.push({ pathname: `/recipe-detail`, params: { recipe: JSON.stringify(item) } })}
+      onPress={() =>
+        router.push({
+          pathname: `/recipe-detail`,
+          params: { recipe: JSON.stringify(item) },
+        })
+      }
     >
-    <View style={styles.carouselItem}>
-    <Image source={{ uri: item.image }} style={styles.recipeImage} />
-    <Text style={styles.recipeTitle}>{item.name}</Text>
-    <View style={styles.timeContainer}>
-      <Icon name="access-time" size={16} color="#555" />
-      <Text style={styles.recipeTime}>{item.timeMinutes} Minuten</Text>
-    </View>
-  </View>
-  </TouchableOpacity>
-
-  
-); 
-  
-  
-
-  // Kategorien nach Küche
-  const allRecipes = [...myRecipes, ...communityRecipes];
-  const cuisines = [...new Set(allRecipes.map(recipe => recipe.cuisine))];
+      <View style={styles.carouselItem}>
+        <Image source={{ uri: item.image }} style={styles.recipeImage} />
+        <Text style={styles.recipeTitle}>{item.name}</Text>
+        <View style={styles.timeContainer}>
+          <Icon name="access-time" size={16} color="#555" />
+          <Text style={styles.recipeTime}>{item.timeMinutes} Minuten</Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => toggleFavorite(item.id)}
+          style={styles.favoriteIcon}
+        >
+          <Icon
+            name={favorites.includes(item.id) ? "favorite" : "favorite-border"}
+            size={24}
+            color={favorites.includes(item.id) ? "#e74c3c" : "#555"}
+          />
+        </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Hallo,</Text>
+      <Text style={styles.title}>Hallo, {user ? user.displayName : "Gast"}</Text>
 
       <Text style={styles.title}>Unsere Rezepte</Text>
       {myRecipes.length > 0 ? (
@@ -113,22 +182,6 @@ export default function Home() {
         <Text style={styles.noRecipesText}>Keine eigenen Rezepte gefunden.</Text>
       )}
 
-      <Text style={styles.title}>Kategorien</Text>
-      <ScrollView
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoriesContainer}
-      >
-        {cuisines.map((cuisine, index) => (
-          <TouchableOpacity
-            key={`${cuisine}-${index}`} // Key durch Kombination aus `cuisine` und `index`
-            style={styles.categoryButton}
-          >
-            <Text style={styles.categoryText}>{cuisine}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
       <Text style={styles.title}>Community-Rezepte</Text>
       {communityRecipes.length > 0 ? (
         <FlatList
@@ -140,7 +193,9 @@ export default function Home() {
           contentContainerStyle={styles.carouselContainer}
         />
       ) : (
-        <Text style={styles.noRecipesText}>Keine Community-Rezepte gefunden.</Text>
+        <Text style={styles.noRecipesText}>
+          Keine Community-Rezepte gefunden.
+        </Text>
       )}
     </ScrollView>
   );
@@ -169,7 +224,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 16,
     marginHorizontal: 8,
-    width: width * 0.7, // 70% der Bildschirmbreite
+    width: width * 0.7,
   },
   recipeImage: {
     width: "100%",
@@ -184,26 +239,12 @@ const styles = StyleSheet.create({
   recipeTime: {
     fontSize: 16,
     color: "#555",
-    marginLeft: 5, // Abstand zwischen Icon und Text
+    marginLeft: 5,
   },
   timeContainer: {
-    flexDirection: "row", // Elemente nebeneinander
-    alignItems: "center", // Vertikale Ausrichtung in der Mitte
-    marginTop: 5, // Abstand nach oben
-  },
-  categoriesContainer: {
     flexDirection: "row",
-    marginBottom: 16,
-  },
-  categoryButton: {
-    backgroundColor: "#f5f5f5",
-    padding: 10,
-    borderRadius: 8,
-    margin: 5,
-  },
-  categoryText: {
-    fontSize: 18,
-    color: "#333",
+    alignItems: "center",
+    marginTop: 5,
   },
   loadingContainer: {
     flex: 1,
@@ -216,26 +257,16 @@ const styles = StyleSheet.create({
     color: "#999",
     marginTop: 16,
   },
-  buttonContainer: {
-    marginTop: 20,
-    alignItems: "center",
+  favoriteIcon: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    backgroundColor: "#fff",
+    borderRadius  : 10,
+    padding: 4,
   },
-  profileButton: {
-    backgroundColor: "#3498db",
-    padding: 10,
-    borderRadius: 8,
-  },
-  profileButtonText: {
-    fontSize: 18,
-    color: "#fff",
-  },
-  timeContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 5, // Abstand nach oben
-  },
-  
 });
+
 
 
 

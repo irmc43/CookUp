@@ -30,7 +30,7 @@ export default function Layout() {
             <Icon name="plus" size={30} color="#fefefe" />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => router.push('/add-recipe')} style={styles.navButton}>
-            <Icon name="heart" size={28} color="#fefefe" />
+            <Icon3 name="favorite" size={30} color="#fefefe" />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => router.push('/profile')} style={styles.navButton}>
             <Icon3 name="person" size={32} color="#fefefe" />
