@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useRouter } from "expo-router";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
+
 export default function Index() {
   const router = useRouter();
   const auth = getAuth();
@@ -20,4 +21,5 @@ export default function Index() {
 
   return null;
 }
+
 

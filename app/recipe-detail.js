@@ -8,17 +8,18 @@ import {
   Button,
   Alert,
 } from "react-native";
-import { useSearchParams } from "expo-router";
 import { getAuth } from "firebase/auth";
 import { firestore } from "./firebase.config";
 import { doc, updateDoc, increment } from "firebase/firestore";
 import { useRoute } from '@react-navigation/native';
+import Checkbox from 'expo-checkbox'; // Importiere Checkbox von expo-checkbox
 
 export default function RecipeDetail() {
   const route = useRoute();
   const { recipe } = route.params;  // Hole die "recipe"-Daten von den Routenparametern
   const [recipeData, setRecipeData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [checkedIngredients, setCheckedIngredients] = useState([]);  // State für die ausgewählten Zutaten
   const auth = getAuth();
   const user = auth.currentUser;
 
@@ -63,6 +64,17 @@ export default function RecipeDetail() {
     }
   };
 
+  // Funktion zum Aktualisieren des Status einer Zutat
+  const handleCheckIngredient = (ingredient) => {
+    setCheckedIngredients((prev) => {
+      if (prev.includes(ingredient)) {
+        return prev.filter((item) => item !== ingredient); // Entfernt das Element, wenn es schon ausgewählt wurde
+      } else {
+        return [...prev, ingredient]; // Fügt das Element hinzu, wenn es nicht ausgewählt wurde
+      }
+    });
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -92,11 +104,17 @@ export default function RecipeDetail() {
         Zubereitungszeit: {recipeData.timeMinutes} Minuten
       </Text>
       <Text style={styles.sectionTitle}>Zutaten</Text>
+
       {recipeData.ingredients?.length > 0 ? (
         recipeData.ingredients.map((ingredient, index) => (
-          <Text key={index} style={styles.text}>
-            - {ingredient}
-          </Text>
+          <View key={index} style={styles.ingredientRow}>
+            <Checkbox
+              value={checkedIngredients.includes(ingredient)} // Setzt den Wert basierend auf dem checked state
+              onValueChange={() => handleCheckIngredient(ingredient)} // Callback, um den Wert zu ändern
+              style={styles.checkbox}
+            />
+            <Text style={styles.text}>{ingredient}</Text>
+          </View>
         ))
       ) : (
         <Text style={styles.text}>Keine Zutaten verfügbar.</Text>
@@ -165,5 +183,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
+  },
+  ingredientRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  checkbox: {
+    marginRight: 8,
   },
 });
