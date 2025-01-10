@@ -13,6 +13,8 @@ import { firestore } from "./firebase.config";
 import { doc, updateDoc, increment, arrayUnion, arrayRemove, getDoc } from "firebase/firestore";
 import Checkbox from "expo-checkbox";
 import Icon from "react-native-vector-icons/MaterialIcons"; 
+import { useRoute } from "@react-navigation/native";
+import { useNavigation } from '@react-navigation/native';
 
 export default function RecipeDetail() {
   const route = useRoute();
@@ -154,7 +156,7 @@ export default function RecipeDetail() {
           Zubereitungszeit: {recipeData.timeMinutes} Minuten
         </Text>
 
-        {/* Favoriten-Button mit Herz-Icon */}
+      {/* Favoriten-Button mit Herz-Icon */}
         <TouchableOpacity style={styles.favoriteButton} onPress={toggleFavorite}>
           <Icon
             name={isFavorite ? "favorite" : "favorite-border"}
