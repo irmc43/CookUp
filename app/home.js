@@ -92,6 +92,10 @@ useEffect(() => {
     );
   }, []);
 
+  // Kategorien nach Küche
+  const allRecipes = [...myRecipes, ...communityRecipes];
+  const cuisines = [...new Set(allRecipes.map(recipe => recipe.cuisine))];
+
   // Community-Rezepte aus Firestore laden
   useEffect(() => {
     const fetchCommunityRecipes = async () => {
@@ -210,8 +214,22 @@ useEffect(() => {
       ) : (
         <Text style={styles.noRecipesText}>Keine eigenen Rezepte gefunden.</Text>
       )}
-
       
+      <Text style={styles.title}>Kategorien</Text>
+      <ScrollView
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.categoriesContainer}
+      >
+        {cuisines.map((cuisine, index) => (
+          <TouchableOpacity
+            key={`${cuisine}-${index}`} // Key durch Kombination aus `cuisine` und `index`
+            style={styles.categoryButton}
+          >
+            <Text style={styles.categoryText}>{cuisine}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
 
       <Text style={styles.title}>Community-Rezepte</Text>
       {communityRecipes.length > 0 ? (
@@ -270,7 +288,21 @@ const styles = StyleSheet.create({
   recipeTime: {
     fontSize: 16,
     color: "#555",
-    marginLeft: 5, // Abstand zwischen Icon und Text
+    marginLeft: 5,
+  },
+  categoriesContainer: {
+    flexDirection: "row",
+    marginBottom: 16,
+  },
+  categoryButton: {
+    backgroundColor: "#f5f5f5",
+    padding: 10,
+    borderRadius: 8,
+    margin: 5,
+  },
+  categoryText: {
+    fontSize: 18,
+    color: "#333",
   },
   timeContainer: {
     flexDirection: "row",

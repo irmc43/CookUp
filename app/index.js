@@ -10,9 +10,9 @@ export default function Index() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        router.replace("/home"); //if logged in to homescreen
+        router.replace("/home"); // falls eingeloggt zum home screen
       } else {
-        router.replace("/login"); //else to login screen
+        router.replace("/login"); // sonst zum login screen
       }
     });
 

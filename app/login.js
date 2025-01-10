@@ -96,7 +96,7 @@ export default function App() {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         console.log("User created successfully!");
 
-        // Speichere den Benutzernamen in Firestore
+        // Benutzernamen in Firestore speichern
         const userId = userCredential.user.uid;
         await setDoc(doc(firestore, "users", userId), {
           username,
