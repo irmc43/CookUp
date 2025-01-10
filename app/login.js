@@ -15,6 +15,7 @@ const AuthScreen = ({
   isLogin,
   setIsLogin,
   handleAuthentication,
+  errorMessage, // Fehlermeldung hinzufügen
 }) => {
   return (
     <View style={styles.authContainer}>
@@ -22,7 +23,7 @@ const AuthScreen = ({
       
       {!isLogin && (
         <TextInput
-          style={styles.input}
+          style={[styles.input, errorMessage ? styles.inputError : null]} // Füge Fehlerstil hinzu
           value={username}
           onChangeText={setUsername}
           placeholder="Benutzername"
@@ -31,9 +32,8 @@ const AuthScreen = ({
         />
       )}
 
-
       <TextInput
-        style={styles.input}
+        style={[styles.input, errorMessage ? styles.inputError : null]} // Füge Fehlerstil hinzu
         value={email}
         onChangeText={setEmail}
         placeholder="E-Mail"
@@ -41,13 +41,17 @@ const AuthScreen = ({
         placeholderTextColor="#929292"
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, errorMessage ? styles.inputError : null]} // Füge Fehlerstil hinzu
         value={password}
         onChangeText={setPassword}
         placeholder="Passwort"
         secureTextEntry
         placeholderTextColor="#929292"
       />
+      
+      {/* Fehlermeldung anzeigen */}
+      {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
+      
       <View style={styles.buttonContainer}>
         <Button
           title={isLogin ? "Anmelden" : "Registrieren"}
@@ -71,6 +75,7 @@ export default function App() {
   const [username, setUsername] = useState(""); // Zustand für Benutzernamen
   const [user, setUser] = useState(null);
   const [isLogin, setIsLogin] = useState(true);
+  const [errorMessage, setErrorMessage] = useState(""); // Zustand für Fehlermeldung
   const router = useRouter();
 
   const auth = getAuth(app);
@@ -88,6 +93,8 @@ export default function App() {
   }, [auth]);
 
   const handleAuthentication = async () => {
+    setErrorMessage(""); // Setze die Fehlermeldung zu Beginn zurück
+
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
@@ -106,6 +113,9 @@ export default function App() {
       }
     } catch (error) {
       console.error("Authentication error:", error.message);
+
+      // Allgemeine Fehlermeldung für falsche Anmeldedaten
+      setErrorMessage("Die eingegebenen Anmeldedaten sind falsch. Bitte überprüfen Sie Ihre E-Mail und Ihr Passwort.");
     }
   };
 
@@ -122,6 +132,7 @@ export default function App() {
           isLogin={isLogin}
           setIsLogin={setIsLogin}
           handleAuthentication={handleAuthentication}
+          errorMessage={errorMessage} // Fehlermeldung weitergeben
         />
       )}
     </ScrollView>
@@ -156,6 +167,9 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 4,
   },
+  inputError: {
+    borderColor: "red", // Roten Rand bei Fehlern
+  },
   buttonContainer: {
     marginBottom: 16,
   },
@@ -165,5 +179,11 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     marginTop: 20,
+  },
+  errorMessage: {
+    color: "red",
+    fontSize: 16,
+    marginVertical: 10,
+    textAlign: "center",
   },
 });

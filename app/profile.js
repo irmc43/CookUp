@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { getAuth, signOut } from "firebase/auth";
 import { useRouter } from "expo-router";
 import { app } from "./firebase.config";
@@ -22,12 +22,29 @@ export default function Profile() {
   }, []);
 
   const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      router.replace("/login");
-    } catch (error) {
-      console.error("Fehler beim Abmelden:", error);
-    }
+    // Bestätigung vor dem Abmelden
+    Alert.alert(
+      "Abmelden?",
+      "Möchten Sie sich wirklich abmelden?",
+      [
+        {
+          text: "Abbrechen",
+          style: "cancel",
+        },
+        {
+          text: "Abmelden",
+          onPress: async () => {
+            try {
+              await signOut(auth);
+              router.replace("/login");
+            } catch (error) {
+              console.error("Fehler beim Abmelden:", error);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   if (!user) {
@@ -78,4 +95,3 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-
