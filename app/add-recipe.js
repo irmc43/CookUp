@@ -4,6 +4,7 @@ import * as ImagePicker from "expo-image-picker";
 import { getAuth } from "firebase/auth";
 import { firestore } from "./firebase.config";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { TouchableOpacity } from "react-native";
 
 export default function AddRecipe() {
   const [name, setName] = useState("");
@@ -116,18 +117,21 @@ export default function AddRecipe() {
       <TextInput
         style={styles.input}
         placeholder="Rezeptname"
+        placeholderTextColor="#888"
         value={name}
         onChangeText={setName}
       />
       <TextInput
         style={styles.input}
         placeholder="Schwierigkeitsgrad (z. B. Einfach, Mittel, Schwer)"
+        placeholderTextColor="#888"
         value={difficulty}
         onChangeText={setDifficulty}
       />
       <TextInput
         style={styles.input}
         placeholder="Zubereitungszeit (Minuten)"
+        placeholderTextColor="#888"
         value={timeMinutes}
         onChangeText={setTimeMinutes}
         keyboardType="numeric"
@@ -136,12 +140,14 @@ export default function AddRecipe() {
       <TextInput
         style={styles.input}
         placeholder="Zutaten (kommagetrennt)"
+        placeholderTextColor="#888"
         value={ingredients.join(", ")}
         onChangeText={(text) => setIngredients(text.split(",").map((item) => item.trim()))}
       />
       <TextInput
         style={styles.input}
         placeholder="Anweisungen (kommagetrennt)"
+        placeholderTextColor="#888"
         value={instructions.join(", ")}
         onChangeText={(text) => setInstructions(text.split(",").map((item) => item.trim()))}
       />
@@ -153,12 +159,21 @@ export default function AddRecipe() {
       
       {imageUri && <Image source={{ uri: imageUri }} style={styles.imagePreview} />}
 
-      <Button
-        title={loading ? "Hinzufügen..." : "Rezept hinzufügen"}
-        onPress={handleAddRecipe}
-        disabled={loading}
-        color="#3498db"
-      />
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          id="add-recipe"
+          style={[
+            styles.addbutton,
+            loading && styles.buttonDisabled,
+          ]}
+          onPress={handleAddRecipe}
+          disabled={loading} 
+        >
+          <Text style={styles.buttonText}>
+            {loading ? "Hinzufügen..." : "Rezept hinzufügen"}
+          </Text>
+        </TouchableOpacity>
+        </View>
     </ScrollView>
   );
 }
@@ -182,6 +197,7 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     borderRadius: 5,
     backgroundColor: "#fefefe",
+    color: "#black",
   },
   imagePreview: {
     width: 100,
@@ -189,12 +205,30 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     borderRadius: 10,
   },
-  Button: {
-    width: 100,
-    height: 100,
-    marginVertical: 10,
-    borderRadius: 10,
+  
+  addbutton: {
+    padding: 12,
+    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#3498db",
   },
+  buttonDisabled: {
+    backgroundColor: "#aaa", 
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
+  buttonContainer: {
+    width: "100%",
+    marginTop: 20,
+    
+  },
+  
+  
 });
 
 
