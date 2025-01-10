@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert, Image } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { getAuth } from "firebase/auth";
-import { firestore } from "./firebase.config";
+import { firestore, storage } from "./firebase.config";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import uuid from "react-native-uuid";
 import { TouchableOpacity } from "react-native";
 
 export default function AddRecipe() {
@@ -70,9 +72,20 @@ export default function AddRecipe() {
     }
 
     setLoading(true);
+    
 
     try {
-      // Rezeptdaten zusammenstellen
+      let imageUrl = null;
+  
+      if (imageUri) {
+        const imageId = uuid.v4();
+        const storageRef = ref(storage, `recipeImages/${user.uid}/${imageId}`);
+        const response = await fetch(imageUri);
+        const blob = await response.blob();
+        await uploadBytes(storageRef, blob);
+        imageUrl = await getDownloadURL(storageRef);
+      }
+  
       const newRecipe = {
         name,
         difficulty,
@@ -84,12 +97,12 @@ export default function AddRecipe() {
         rating: 0,
         reviewCount: 0,
         image: imageUri,
+        image: imageUrl, 
       };
-
-      // Rezept in Firestore speichern
+  
       const recipeRef = collection(firestore, "communityRecipes");
       await addDoc(recipeRef, newRecipe);
-
+  
       Alert.alert("Erfolg", "Rezept wurde erfolgreich hinzugefügt!");
       resetForm();
     } catch (error) {
@@ -99,6 +112,7 @@ export default function AddRecipe() {
       setLoading(false);
     }
   };
+  
 
   // Formular zurücksetzen
   const resetForm = () => {
