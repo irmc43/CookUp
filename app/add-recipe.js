@@ -13,8 +13,10 @@ import {
 import DropDownPicker from "react-native-dropdown-picker";
 import * as ImagePicker from "expo-image-picker";
 import { getAuth } from "firebase/auth";
-import { firestore } from "./firebase.config";
+import { firestore, storage } from "./firebase.config";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import uuid from "react-native-uuid";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
 export default function AddRecipe() {
@@ -78,15 +80,26 @@ export default function AddRecipe() {
       Alert.alert("Fehler", "Bitte melden Sie sich an, um ein Rezept hinzuzufügen.");
       return;
     }
-
+  
     if (!name || !difficulty || !timeMinutes || ingredients.length === 0 || instructions.length === 0) {
       Alert.alert("Fehler", "Bitte füllen Sie alle Felder aus.");
       return;
     }
-
+  
     setLoading(true);
-
+  
     try {
+      let imageUrl = null;
+  
+      if (imageUri) {
+        const imageId = uuid.v4();
+        const storageRef = ref(storage, `recipeImages/${user.uid}/${imageId}`);
+        const response = await fetch(imageUri);
+        const blob = await response.blob();
+        await uploadBytes(storageRef, blob);
+        imageUrl = await getDownloadURL(storageRef);
+      }
+  
       const newRecipe = {
         name,
         difficulty,
@@ -97,12 +110,12 @@ export default function AddRecipe() {
         createdAt: Timestamp.now(),
         rating: 0,
         reviewCount: 0,
-        image: imageUri,
+        image: imageUrl, 
       };
-
+  
       const recipeRef = collection(firestore, "communityRecipes");
       await addDoc(recipeRef, newRecipe);
-
+  
       Alert.alert("Erfolg", "Rezept wurde erfolgreich hinzugefügt!");
       resetForm();
     } catch (error) {
@@ -112,6 +125,7 @@ export default function AddRecipe() {
       setLoading(false);
     }
   };
+  
 
   const handleAddIngredient = () => {
     if (ingredientName.trim() === "" || ingredientAmount.trim() === "") return;
