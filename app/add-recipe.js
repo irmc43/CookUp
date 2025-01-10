@@ -1,30 +1,48 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert, Image } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  FlatList,
+  Alert,
+  Image,
+  TouchableOpacity,
+} from "react-native";
+import DropDownPicker from "react-native-dropdown-picker";
 import * as ImagePicker from "expo-image-picker";
 import { getAuth } from "firebase/auth";
 import { firestore, storage } from "./firebase.config";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import uuid from "react-native-uuid";
-import { TouchableOpacity } from "react-native";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 export default function AddRecipe() {
   const [name, setName] = useState("");
-  const [difficulty, setDifficulty] = useState("");
+  const [difficulty, setDifficulty] = useState("Einfach");
   const [timeMinutes, setTimeMinutes] = useState("");
   const [ingredients, setIngredients] = useState([]);
   const [instructions, setInstructions] = useState([]);
+  const [ingredientName, setIngredientName] = useState("");
+  const [ingredientAmount, setIngredientAmount] = useState("");
+  const [instructionInput, setInstructionInput] = useState("");
   const [imageUri, setImageUri] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [items] = useState([
+    { label: "Einfach", value: "Einfach" },
+    { label: "Mittel", value: "Mittel" },
+    { label: "Schwierig", value: "Schwierig" },
+  ]);
 
   const auth = getAuth();
   const user = auth.currentUser;
 
-  // Funktion zum Bild auswählen
   const pickImage = async () => {
-    // Berechtigungen anfordern
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permissionResult.granted === false) {
+    if (!permissionResult.granted) {
       alert("Permission to access media library is required!");
       return;
     }
@@ -36,15 +54,13 @@ export default function AddRecipe() {
     });
 
     if (!result.canceled) {
-      setImageUri(result.assets[0].uri); // Setze den URI des Bildes
+      setImageUri(result.assets[0].uri);
     }
   };
 
-  // Funktion zum Foto aufnehmen
   const takePhoto = async () => {
-    // Berechtigungen anfordern
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-    if (permissionResult.granted === false) {
+    if (!permissionResult.granted) {
       alert("Permission to access camera is required!");
       return;
     }
@@ -55,11 +71,10 @@ export default function AddRecipe() {
     });
 
     if (!result.canceled) {
-      setImageUri(result.assets[0].uri); // Setze den URI des aufgenommenen Bildes
+      setImageUri(result.assets[0].uri);
     }
   };
 
-  // Funktion zum Hinzufügen eines Rezepts
   const handleAddRecipe = async () => {
     if (!user) {
       Alert.alert("Fehler", "Bitte melden Sie sich an, um ein Rezept hinzuzufügen.");
@@ -72,11 +87,10 @@ export default function AddRecipe() {
     }
 
     setLoading(true);
-    
 
     try {
       let imageUrl = null;
-  
+
       if (imageUri) {
         const imageId = uuid.v4();
         const storageRef = ref(storage, `recipeImages/${user.uid}/${imageId}`);
@@ -85,7 +99,7 @@ export default function AddRecipe() {
         await uploadBytes(storageRef, blob);
         imageUrl = await getDownloadURL(storageRef);
       }
-  
+
       const newRecipe = {
         name,
         difficulty,
@@ -96,13 +110,12 @@ export default function AddRecipe() {
         createdAt: Timestamp.now(),
         rating: 0,
         reviewCount: 0,
-        image: imageUri,
-        image: imageUrl, 
+        image: imageUrl,
       };
-  
+
       const recipeRef = collection(firestore, "communityRecipes");
       await addDoc(recipeRef, newRecipe);
-  
+
       Alert.alert("Erfolg", "Rezept wurde erfolgreich hinzugefügt!");
       resetForm();
     } catch (error) {
@@ -112,91 +125,144 @@ export default function AddRecipe() {
       setLoading(false);
     }
   };
-  
 
-  // Formular zurücksetzen
+  const handleAddIngredient = () => {
+    if (ingredientName.trim() === "" || ingredientAmount.trim() === "") return;
+    setIngredients([...ingredients, { name: ingredientName, amount: ingredientAmount }]);
+    setIngredientName("");
+    setIngredientAmount("");
+  };
+
+  const handleAddInstruction = () => {
+    if (instructionInput.trim() === "") return;
+    setInstructions([...instructions, instructionInput]);
+    setInstructionInput("");
+  };
+
+  const removeIngredient = (index) => {
+    const updatedIngredients = ingredients.filter((_, i) => i !== index);
+    setIngredients(updatedIngredients);
+  };
+
+  const removeInstruction = (index) => {
+    const updatedInstructions = instructions.filter((_, i) => i !== index);
+    setInstructions(updatedInstructions);
+  };
+
   const resetForm = () => {
     setName("");
-    setDifficulty("");
+    setDifficulty("Einfach");
     setTimeMinutes("");
     setIngredients([]);
     setInstructions([]);
-    setImageUri(null); // Bild-URI zurücksetzen
+    setImageUri(null);
+    setIngredientName("");
+    setIngredientAmount("");
+    setInstructionInput("");
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.title}>Rezept hinzufügen</Text>
 
       <TextInput
         style={styles.input}
         placeholder="Rezeptname"
-        placeholderTextColor="#888"
         value={name}
         onChangeText={setName}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Schwierigkeitsgrad (z. B. Einfach, Mittel, Schwer)"
-        placeholderTextColor="#888"
+
+      <Text style={styles.label}>Schwierigkeitsgrad:</Text>
+      <DropDownPicker
+        open={open}
         value={difficulty}
-        onChangeText={setDifficulty}
+        items={items}
+        setOpen={setOpen}
+        setValue={setDifficulty}
+        style={styles.picker}
+        placeholder="Wählen Sie eine Option"
       />
+
       <TextInput
         style={styles.input}
         placeholder="Zubereitungszeit (Minuten)"
-        placeholderTextColor="#888"
         value={timeMinutes}
         onChangeText={setTimeMinutes}
         keyboardType="numeric"
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Zutaten (kommagetrennt)"
-        placeholderTextColor="#888"
-        value={ingredients.join(", ")}
-        onChangeText={(text) => setIngredients(text.split(",").map((item) => item.trim()))}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Anweisungen (kommagetrennt)"
-        placeholderTextColor="#888"
-        value={instructions.join(", ")}
-        onChangeText={(text) => setInstructions(text.split(",").map((item) => item.trim()))}
+      <View style={styles.ingredientContainer}>
+        <TextInput
+          style={[styles.input, styles.amountInput]}
+          placeholder="Menge (z.B. 200g)"
+          value={ingredientAmount}
+          onChangeText={setIngredientAmount}
+        />
+        <TextInput
+          style={[styles.input, styles.ingredientInput]}
+          placeholder="Zutat (z.B. Zucker)"
+          value={ingredientName}
+          onChangeText={setIngredientName}
+        />
+      </View>
+      <Button title="Zutat hinzufügen" onPress={handleAddIngredient} />
+
+      <FlatList
+        data={ingredients}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item, index }) => (
+          <View style={styles.listItemContainer}>
+            <Text style={styles.listItem}>
+              {item.amount} {item.name}
+            </Text>
+            <TouchableOpacity onPress={() => removeIngredient(index)}>
+              <Icon name="close" size={24} color="#e74c3c" />
+            </TouchableOpacity>
+          </View>
+        )}
       />
 
-      {/* Bild auswählen */}
+      <TextInput
+        style={styles.input}
+        placeholder="Anweisung hinzufügen"
+        value={instructionInput}
+        onChangeText={setInstructionInput}
+      />
+      <Button title="Anweisung hinzufügen" onPress={handleAddInstruction} />
+
+      <FlatList
+        data={instructions}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item, index }) => (
+          <View style={styles.listItemContainer}>
+            <Text style={styles.listItem}>{item}</Text>
+            <TouchableOpacity onPress={() => removeInstruction(index)}>
+              <Icon name="close" size={24} color="#e74c3c" />
+            </TouchableOpacity>
+          </View>
+        )}
+      />
+
       <Button title="Bild auswählen" onPress={pickImage} />
-      {/* Foto aufnehmen */}
       <Button title="Foto aufnehmen" onPress={takePhoto} />
-      
+
       {imageUri && <Image source={{ uri: imageUri }} style={styles.imagePreview} />}
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          id="add-recipe"
-          style={[
-            styles.addbutton,
-            loading && styles.buttonDisabled,
-          ]}
-          onPress={handleAddRecipe}
-          disabled={loading} 
-        >
-          <Text style={styles.buttonText}>
-            {loading ? "Hinzufügen..." : "Rezept hinzufügen"}
-          </Text>
-        </TouchableOpacity>
-        </View>
-    </ScrollView>
+      <Button
+        title={loading ? "Hinzufügen..." : "Rezept hinzufügen"}
+        onPress={handleAddRecipe}
+        disabled={loading}
+        color="#3498db"
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginTop:78,
+    marginTop: 40,
     padding: 16,
-    alignItems: "center",
+    flex: 1,
   },
   title: {
     fontSize: 24,
@@ -211,7 +277,21 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     borderRadius: 5,
     backgroundColor: "#fefefe",
-    color: "#black",
+  },
+  picker: {
+    marginBottom: 10,
+  },
+  listItemContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 4,
+    justifyContent: "space-between",
+  },
+  listItem: {
+    fontSize: 16,
+    color: "#333",
+    marginRight: 8,
+    flex: 1,
   },
   imagePreview: {
     width: 100,
@@ -219,30 +299,18 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     borderRadius: 10,
   },
-  
-  addbutton: {
-    padding: 12,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#3498db",
-  },
-  buttonDisabled: {
-    backgroundColor: "#aaa", 
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-
-  buttonContainer: {
+  ingredientContainer: {
+    flexDirection: "row",
     width: "100%",
-    marginTop: 20,
-    
+    marginBottom: 10,
   },
-  
-  
+  ingredientInput: {
+    flex: 2,
+    marginRight: 8,
+  },
+  amountInput: {
+    flex: 1,
+  },
 });
 
 
