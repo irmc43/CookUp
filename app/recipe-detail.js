@@ -116,19 +116,22 @@ export default function RecipeDetail() {
         <Text style={styles.sectionTitle}>Zutaten</Text>
 
         {recipeData.ingredients?.length > 0 ? (
-          recipeData.ingredients.map((ingredient, index) => (
-            <View key={index} style={styles.ingredientRow}>
-              <Checkbox
-                value={checkedIngredients.includes(ingredient)}
-                onValueChange={() => handleCheckIngredient(ingredient)}
-                style={styles.checkbox}
-              />
-              <Text style={styles.text}>{ingredient}</Text>
-            </View>
-          ))
-        ) : (
-          <Text style={styles.text}>Keine Zutaten verfügbar.</Text>
-        )}
+  recipeData.ingredients.map((ingredient, index) => (
+    <View key={index} style={styles.ingredientRow}>
+      <Checkbox
+        value={checkedIngredients.includes(ingredient.name)} // Nur den Namen überprüfen
+        onValueChange={() => handleCheckIngredient(ingredient.name)} // Nur den Namen verarbeiten
+        style={styles.checkbox}
+      />
+      <Text style={styles.text}>
+        {ingredient.amount} {ingredient.name}
+      </Text>
+    </View>
+  ))
+) : (
+  <Text style={styles.text}>Keine Zutaten verfügbar.</Text>
+)}
+
 
         <Text style={styles.sectionTitle}>Anweisungen</Text>
         {recipeData.instructions?.length > 0 ? (
