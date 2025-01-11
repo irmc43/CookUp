@@ -13,8 +13,7 @@ import { firestore } from "./firebase.config";
 import { doc, updateDoc, increment, arrayUnion, arrayRemove, getDoc } from "firebase/firestore";
 import Checkbox from "expo-checkbox";
 import Icon from "react-native-vector-icons/MaterialIcons"; 
-import { useRoute } from "@react-navigation/native";
-import { useNavigation } from '@react-navigation/native';
+import { useRoute, useNavigation } from "@react-navigation/native";
 
 export default function RecipeDetail() {
   const route = useRoute();
@@ -141,7 +140,7 @@ export default function RecipeDetail() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Zurück</Text>
+        <Icon name="arrow-back" size={28} color="#3498db" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Rezeptdetails</Text>
       </View>
@@ -211,16 +210,15 @@ export default function RecipeDetail() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    padding: 20,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 15,
+    paddingRight: 2,
+    paddingLeft: 0,
     paddingVertical: 10,
-    paddingTop: 30,
-    backgroundColor: "#fff",
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
   },

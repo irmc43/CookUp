@@ -260,8 +260,7 @@ export default function AddRecipe() {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 40,
-    padding: 16,
+    padding: 20,
     flex: 1,
   },
   title: {

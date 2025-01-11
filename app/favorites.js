@@ -175,8 +175,7 @@ export default function Favorites() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    paddingTop: 50,
+    padding: 20,
   },
   title: {
     fontSize: 24,

@@ -11,7 +11,6 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { getAuth } from "firebase/auth";
 import { ref, onValue } from "firebase/database";
 import {
@@ -42,8 +41,6 @@ export default function Home() {
   const auth = getAuth();
   const user = auth.currentUser;
 
-  const insets = useSafeAreaInsets(); // sichere Abstände für IOS- und Android-Geräte
-
   // Benutzerdetails laden
   useEffect(() => {
     const fetchUserName = async () => {
@@ -53,7 +50,7 @@ export default function Home() {
           const userDoc = await getDoc(userDocRef);
 
           if (userDoc.exists() && userDoc.data().username) {
-            setUserName(userDoc.data().username);
+            setUserName(userDoc.data().username); // Benutzername aus Firestore setzen
           } else {
             console.warn("Kein Benutzername in Firestore gefunden.");
             setUserName("Gast");
@@ -204,79 +201,67 @@ export default function Home() {
   );
 
   return (
-    <SafeAreaProvider>
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        <ScrollView>
-          <Text style={styles.title}>Hallo, {userName}</Text>
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>Hallo, {userName}</Text>
 
-          <Text style={styles.title}>Unsere Rezepte</Text>
-          {myRecipes.length > 0 ? (
-            <FlatList
-              data={myRecipes}
-              renderItem={renderRecipeItem}
-              keyExtractor={(item) => item.id.toString()}
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.carouselContainer}
-            />
-          ) : (
-            <Text style={styles.noRecipesText}>
-              Keine eigenen Rezepte gefunden.
-            </Text>
-          )}
-          
-          <Text style={styles.title}>Kategorien</Text>
-          <ScrollView
+      <Text style={styles.title}>Unsere Rezepte</Text>
+      {myRecipes.length > 0 ? (
+        <FlatList
+          data={myRecipes}
+          renderItem={renderRecipeItem}
+          keyExtractor={(item) => item.id.toString()}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoriesContainer}
-          >
-            {cuisines.map((cuisine, index) => (
-              <TouchableOpacity
-              key={`${cuisine}-${index}`} // Key durch Kombination aus `cuisine` und `index`
-              style={styles.categoryButton}
-              >
-                <Text style={styles.categoryText}>{cuisine}</Text>
-                </TouchableOpacity>
-              ))}
-          </ScrollView>
+          contentContainerStyle={styles.carouselContainer}
+        />
+      ) : (
+        <Text style={styles.noRecipesText}>Keine eigenen Rezepte gefunden.</Text>
+      )}
 
-          <Text style={styles.title}>Community-Rezepte</Text>
-          {communityRecipes.length > 0 ? (
-            <FlatList
-              data={communityRecipes}
-              renderItem={renderRecipeItem}
-              keyExtractor={(item) => item.id.toString()}
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.carouselContainer}
-            />
-          ) : (
-            <Text style={styles.noRecipesText}>
-              Keine Community-Rezepte gefunden.
-            </Text>
-          )}
-        </ScrollView>
-      </View>
-    </SafeAreaProvider>
+<Text style={styles.title}>Kategorien</Text>
+      <ScrollView
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.categoriesContainer}
+      >
+        {cuisines.map((cuisine, index) => (
+          <TouchableOpacity
+            key={`${cuisine}-${index}`} // Key durch Kombination aus `cuisine` und `index`
+            style={styles.categoryButton}
+          >
+            <Text style={styles.categoryText}>{cuisine}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      <Text style={styles.title}>Community-Rezepte</Text>
+      {communityRecipes.length > 0 ? (
+        <FlatList
+          data={communityRecipes}
+          renderItem={renderRecipeItem}
+          keyExtractor={(item) => item.id.toString()}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.carouselContainer}
+        />
+      ) : (
+        <Text style={styles.noRecipesText}>
+          Keine Community-Rezepte gefunden.
+        </Text>
+      )}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: "#fff",
+    padding: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 16,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
   },
   carouselContainer: {
     flexDirection: "row",
@@ -321,10 +306,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#333",
   },
+
   timeContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginTop: 5,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   noRecipesText: {
     textAlign: "center",
