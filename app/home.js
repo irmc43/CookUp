@@ -11,6 +11,7 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
+import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { getAuth } from "firebase/auth";
 import { ref, onValue } from "firebase/database";
 import {
@@ -36,38 +37,43 @@ export default function Home() {
   const [loadingCommunityRecipes, setLoadingCommunityRecipes] = useState(true);
   const [loadingUser, setLoadingUser] = useState(true);
   const [userName, setUserName] = useState("Gast");
+
   const router = useRouter();
   const auth = getAuth();
   const user = auth.currentUser;
 
-// Benutzerdetails laden
-useEffect(() => {
-  const fetchUserName = async () => {
-    try {
-      if (user) {
-        const userDocRef = doc(firestore, "users", user.uid);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists() && userDoc.data().username) {
-          setUserName(userDoc.data().username); // Benutzername aus Firestore setzen
+  const insets = useSafeAreaInsets(); // sichere Abstände für IOS- und Android-Geräte
+
+  // Benutzerdetails laden
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        if (user) {
+          const userDocRef = doc(firestore, "users", user.uid);
+          const userDoc = await getDoc(userDocRef);
+
+          if (userDoc.exists() && userDoc.data().username) {
+            setUserName(userDoc.data().username);
+          } else {
+            console.warn("Kein Benutzername in Firestore gefunden.");
+            setUserName("Gast");
+          }
         } else {
-          console.warn("Kein Benutzername in Firestore gefunden.");
+          console.warn("Kein angemeldeter Benutzer gefunden.");
           setUserName("Gast");
         }
-      } else {
-        console.warn("Kein angemeldeter Benutzer gefunden.");
+      } catch (error) {
+        console.error("Fehler beim Abrufen des Benutzernamens:", error);
         setUserName("Gast");
+      } finally {
+        setLoadingUser(false);
       }
-    } catch (error) {
-      console.error("Fehler beim Abrufen des Benutzernamens:", error);
-      setUserName("Gast");
-    } finally {
-      setLoadingUser(false);
-    }
-  };
-  fetchUserName();
-}, [user]);
+    };
 
-// Eigene Rezepte
+    fetchUserName();
+  }, [user]);
+
+  // Eigene Rezepte
   useEffect(() => {
     const recipesRef = ref(db, "recipes");
     onValue(
@@ -96,7 +102,7 @@ useEffect(() => {
   const allRecipes = [...myRecipes, ...communityRecipes];
   const cuisines = [...new Set(allRecipes.map(recipe => recipe.cuisine))];
 
-  // Community-Rezepte aus Firestore laden
+  // Community-Rezepte
   useEffect(() => {
     const fetchCommunityRecipes = async () => {
       try {
@@ -118,7 +124,7 @@ useEffect(() => {
     fetchCommunityRecipes();
   }, []);
 
-  // Favoriten des Benutzers laden
+  // Favoriten des Benutzers
   useEffect(() => {
     const fetchFavorites = async () => {
       if (user) {
@@ -169,14 +175,14 @@ useEffect(() => {
 
   const renderRecipeItem = ({ item }) => (
     <TouchableOpacity
-    onPress={() =>
-      router.push({
-        pathname: `/recipe-detail`,
-        params: { recipe: JSON.stringify(item) },
-      })
-    }
+      onPress={() =>
+        router.push({
+          pathname: `/recipe-detail`,
+          params: { recipe: JSON.stringify(item) },
+        })
+      }
     >
-   <View style={styles.carouselItem}>
+      <View style={styles.carouselItem}>
         <Image source={{ uri: item.image }} style={styles.recipeImage} />
         <Text style={styles.recipeTitle}>{item.name}</Text>
         <View style={styles.timeContainer}>
@@ -196,70 +202,81 @@ useEffect(() => {
       </View>
     </TouchableOpacity>
   );
-  
+
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Hallo, {userName}</Text>
+    <SafeAreaProvider>
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <ScrollView>
+          <Text style={styles.title}>Hallo, {userName}</Text>
 
-      <Text style={styles.title}>Unsere Rezepte</Text>
-      {myRecipes.length > 0 ? (
-        <FlatList
-          data={myRecipes}
-          renderItem={renderRecipeItem}
-          keyExtractor={(item) => item.id.toString()}
+          <Text style={styles.title}>Unsere Rezepte</Text>
+          {myRecipes.length > 0 ? (
+            <FlatList
+              data={myRecipes}
+              renderItem={renderRecipeItem}
+              keyExtractor={(item) => item.id.toString()}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.carouselContainer}
+            />
+          ) : (
+            <Text style={styles.noRecipesText}>
+              Keine eigenen Rezepte gefunden.
+            </Text>
+          )}
+          
+          <Text style={styles.title}>Kategorien</Text>
+          <ScrollView
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.carouselContainer}
-        />
-      ) : (
-        <Text style={styles.noRecipesText}>Keine eigenen Rezepte gefunden.</Text>
-      )}
-      
-      <Text style={styles.title}>Kategorien</Text>
-      <ScrollView
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoriesContainer}
-      >
-        {cuisines.map((cuisine, index) => (
-          <TouchableOpacity
-            key={`${cuisine}-${index}`} // Key durch Kombination aus `cuisine` und `index`
-            style={styles.categoryButton}
+          contentContainerStyle={styles.categoriesContainer}
           >
-            <Text style={styles.categoryText}>{cuisine}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+            {cuisines.map((cuisine, index) => (
+              <TouchableOpacity
+              key={`${cuisine}-${index}`} // Key durch Kombination aus `cuisine` und `index`
+              style={styles.categoryButton}
+              >
+                <Text style={styles.categoryText}>{cuisine}</Text>
+                </TouchableOpacity>
+              ))}
+          </ScrollView>
 
-      <Text style={styles.title}>Community-Rezepte</Text>
-      {communityRecipes.length > 0 ? (
-        <FlatList
-          data={communityRecipes}
-          renderItem={renderRecipeItem}
-          keyExtractor={(item) => item.id.toString()}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.carouselContainer}
-        />
-      ) : (
-        <Text style={styles.noRecipesText}>
-          Keine Community-Rezepte gefunden.
-        </Text>
-      )}
-    </ScrollView>
+          <Text style={styles.title}>Community-Rezepte</Text>
+          {communityRecipes.length > 0 ? (
+            <FlatList
+              data={communityRecipes}
+              renderItem={renderRecipeItem}
+              keyExtractor={(item) => item.id.toString()}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.carouselContainer}
+            />
+          ) : (
+            <Text style={styles.noRecipesText}>
+              Keine Community-Rezepte gefunden.
+            </Text>
+          )}
+        </ScrollView>
+      </View>
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 40,
     flex: 1,
     padding: 16,
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   carouselContainer: {
     flexDirection: "row",
@@ -309,11 +326,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 5,
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   noRecipesText: {
     textAlign: "center",
     fontSize: 16,
@@ -325,7 +337,7 @@ const styles = StyleSheet.create({
     top: 20,
     right: 20,
     backgroundColor: "#fff",
-    borderRadius  : 10,
+    borderRadius: 10,
     padding: 4,
   },
 });

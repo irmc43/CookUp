@@ -95,3 +95,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
+/* alte abmeldefunktion für web
+const handleLogout = async () => {
+  try {
+    await signOut(auth);
+    router.replace("/login");
+  } catch (error) {
+    console.error("Fehler beim Abmelden:", error);
+  }
+};*/

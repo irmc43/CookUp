@@ -15,7 +15,7 @@ const AuthScreen = ({
   isLogin,
   setIsLogin,
   handleAuthentication,
-  errorMessage, // Fehlermeldung hinzufügen
+  errorMessage,
 }) => {
   return (
     <View style={styles.authContainer}>
@@ -23,7 +23,7 @@ const AuthScreen = ({
       
       {!isLogin && (
         <TextInput
-          style={[styles.input, errorMessage ? styles.inputError : null]} // Füge Fehlerstil hinzu
+          style={[styles.input, errorMessage ? styles.inputError : null]}
           value={username}
           onChangeText={setUsername}
           placeholder="Benutzername"
@@ -33,7 +33,7 @@ const AuthScreen = ({
       )}
 
       <TextInput
-        style={[styles.input, errorMessage ? styles.inputError : null]} // Füge Fehlerstil hinzu
+        style={[styles.input, errorMessage ? styles.inputError : null]} 
         value={email}
         onChangeText={setEmail}
         placeholder="E-Mail"
@@ -41,7 +41,7 @@ const AuthScreen = ({
         placeholderTextColor="#929292"
       />
       <TextInput
-        style={[styles.input, errorMessage ? styles.inputError : null]} // Füge Fehlerstil hinzu
+        style={[styles.input, errorMessage ? styles.inputError : null]}
         value={password}
         onChangeText={setPassword}
         placeholder="Passwort"
@@ -49,7 +49,6 @@ const AuthScreen = ({
         placeholderTextColor="#929292"
       />
       
-      {/* Fehlermeldung anzeigen */}
       {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
       
       <View style={styles.buttonContainer}>
@@ -72,10 +71,10 @@ const AuthScreen = ({
 export default function App() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [username, setUsername] = useState(""); // Zustand für Benutzernamen
+  const [username, setUsername] = useState(""); 
   const [user, setUser] = useState(null);
   const [isLogin, setIsLogin] = useState(true);
-  const [errorMessage, setErrorMessage] = useState(""); // Zustand für Fehlermeldung
+  const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
 
   const auth = getAuth(app);
@@ -93,7 +92,7 @@ export default function App() {
   }, [auth]);
 
   const handleAuthentication = async () => {
-    setErrorMessage(""); // Setze die Fehlermeldung zu Beginn zurück
+    setErrorMessage(""); // Fehlermeldung zu Beginn wird zurückgesetzt
 
     try {
       if (isLogin) {
@@ -132,7 +131,7 @@ export default function App() {
           isLogin={isLogin}
           setIsLogin={setIsLogin}
           handleAuthentication={handleAuthentication}
-          errorMessage={errorMessage} // Fehlermeldung weitergeben
+          errorMessage={errorMessage} 
         />
       )}
     </ScrollView>
@@ -168,7 +167,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   inputError: {
-    borderColor: "red", // Roten Rand bei Fehlern
+    borderColor: "red", 
   },
   buttonContainer: {
     marginBottom: 16,
