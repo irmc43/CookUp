@@ -25,7 +25,7 @@ export default function Layout() {
             <TouchableOpacity onPress={() => router.push('/home')} style={styles.navButton}>
               <Icon2 name="home" size={32} color="#fefefe" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push('/home')} style={styles.navButton}>
+            <TouchableOpacity onPress={() => router.push('/search')} style={styles.navButton}>
               <Icon name="search1" size={28} color="#fefefe" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => router.push('/add-recipe')} style={styles.navButton}>
