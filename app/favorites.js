@@ -75,6 +75,9 @@ export default function Favorites() {
           }
         }
 
+        // Favoriten alphabetisch nach Namen
+        loadedFavorites.sort((a, b) => a.name.localeCompare(b.name));
+
         setFavorites(loadedFavorites);
       } else {
         console.error("Benutzerdaten nicht gefunden.");
