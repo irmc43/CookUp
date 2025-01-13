@@ -59,15 +59,22 @@ export default function Profile() {
     <View style={styles.container}>
       <Text style={styles.title}>Profil</Text>
       <Text style={styles.infoText}>E-Mail: {user.email}</Text>
-      <TouchableOpacity
-      onPress={() =>
-        router.push({
-          pathname: `/my-recipes`,
-        })
-      }
-    >
-      <Text>Ihre Rezept</Text> 
-    </TouchableOpacity>
+      
+      <TouchableOpacity style={styles.myRecButton}
+        onPress={() =>
+          router.push({
+            pathname: `/my-recipes`,
+          })}>
+        <Text  style={styles.myRecText}>Meine Rezepte</Text> 
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.myRecButton}
+        onPress={() =>
+          router.push({
+            pathname: `/favorites`,
+          })}>
+        <Text  style={styles.myRecText}>Meine Favoriten</Text> 
+      </TouchableOpacity>
+      
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Abmelden</Text>
       </TouchableOpacity>
@@ -78,39 +85,43 @@ export default function Profile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: "center", // Vertikal zentrieren
+    alignItems: "center", // Horizontal zentrieren
     padding: 20,
   },
   title: {
     fontSize: 24,
+    fontWeight: "bold",
     marginBottom: 16,
-    textAlign: "center",
   },
   infoText: {
     fontSize: 18,
     marginBottom: 24,
   },
   logoutButton: {
-    backgroundColor: "#3498db",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    marginTop: 20,
+    padding: 12,
+    backgroundColor: "#E74C3C",
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop:10,
+    width: "80%"
   },
   logoutButtonText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  myRecButton:{
+    padding: 12,
+    backgroundColor: "#3498db",
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop:10,
+    width: "80%"
+  },
+  myRecText: {
+    color: "#fff",
+    fontSize: 16,
     fontWeight: "bold",
   },
 });
-
-/* alte abmeldefunktion für web
-const handleLogout = async () => {
-  try {
-    await signOut(auth);
-    router.replace("/login");
-  } catch (error) {
-    console.error("Fehler beim Abmelden:", error);
-  }
-};*/

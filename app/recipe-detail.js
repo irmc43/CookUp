@@ -151,7 +151,8 @@ export default function RecipeDetail() {
         )}
         <Text style={styles.title}>{recipeData.name}</Text>
         <Text style={styles.subtitle}>Schwierigkeit: {recipeData.difficulty}</Text>
-        <Text style={styles.subtitle}>
+        <Text paddingBottom={20}
+         style={styles.subtitle}>
           Zubereitungszeit: {recipeData.timeMinutes} Minuten
         </Text>
 
@@ -211,6 +212,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    paddingTop: 0,
   },
   header: {
     flexDirection: "row",
@@ -218,7 +220,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingRight: 2,
     paddingLeft: 0,
-    paddingVertical: 10,
+    paddingVertical: 0,
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
   },
@@ -288,7 +290,7 @@ const styles = StyleSheet.create({
   },
   favoriteButton: {
     padding: 10,
-    backgroundColor: "#e74c3c",
+    backgroundColor: "#E0115F",
     borderRadius: 5,
     alignItems: "center",
     marginBottom: 16,

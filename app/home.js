@@ -193,7 +193,7 @@ export default function Home() {
           <Icon
             name={favorites.includes(item.id) ? "favorite" : "favorite-border"}
             size={24}
-            color={favorites.includes(item.id) ? "#e74c3c" : "#555"}
+            color={favorites.includes(item.id) ? "#E0115F" : "#555"}
           />
         </TouchableOpacity>
       </View>

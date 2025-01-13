@@ -161,7 +161,7 @@ export default function Favorites() {
               <View style={styles.favoriteItem}>
                 <Text style={styles.favoriteText}>{item.name}</Text>
                 <TouchableOpacity onPress={() => toggleFavorite(item.id)}>
-                  <Icon name="favorite" size={24} color="red" />
+                  <Icon name="favorite" size={24} color="#E0115F" />
                 </TouchableOpacity>
               </View>
             </TouchableOpacity>
