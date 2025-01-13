@@ -167,6 +167,8 @@ export default function Favorites() {
             </TouchableOpacity>
           )}
           keyExtractor={(item) => item.id.toString()}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+
         />
       ) : (
         <Text>Keine Favoriten gefunden.</Text>
@@ -195,5 +197,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#333",
     flex: 1,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: "#ddd", // Farbe der Linie
+    marginVertical: 8,       // Abstand über/unter der Linie
   },
 });
