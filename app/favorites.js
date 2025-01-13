@@ -152,7 +152,7 @@ export default function Favorites() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Ihre Favoriten</Text>
+      <Text style={styles.title}>Meine Favoriten</Text>
       {favorites.length > 0 ? (
         <FlatList
           data={favorites}
@@ -188,10 +188,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   favoriteItem: {
+    padding: 10,
+    borderRadius: 8,
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    marginVertical: 10,
+    alignItems: "center",
   },
   favoriteText: {
     fontSize: 18,
@@ -200,7 +201,7 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 1,
-    backgroundColor: "#ddd", // Farbe der Linie
-    marginVertical: 8,       // Abstand über/unter der Linie
+    backgroundColor: "#ddd",
+    marginVertical: 5,
   },
 });

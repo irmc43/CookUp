@@ -59,6 +59,15 @@ export default function Profile() {
     <View style={styles.container}>
       <Text style={styles.title}>Profil</Text>
       <Text style={styles.infoText}>E-Mail: {user.email}</Text>
+      <TouchableOpacity
+      onPress={() =>
+        router.push({
+          pathname: `/my-recipes`,
+        })
+      }
+    >
+      <Text>Ihre Rezept</Text> 
+    </TouchableOpacity>
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Abmelden</Text>
       </TouchableOpacity>
