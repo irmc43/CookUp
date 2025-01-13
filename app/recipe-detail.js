@@ -57,31 +57,11 @@ export default function RecipeDetail() {
   };
 
   const handleRateRecipe = async () => {
-    if (!user) {
       Alert.alert(
-        "Anmeldung erforderlich",
-        "Bitte melden Sie sich an, um das Rezept zu bewerten."
+        "Fehler",
+        "Derzeit keine Bewertung möglich"
       );
       return;
-    }
-
-    if (!recipeData || !recipeData.id) {
-      Alert.alert("Fehler", "Rezeptdaten fehlen.");
-      return;
-    }
-
-    try {
-      const recipeRef = doc(firestore, "communityRecipes", recipeData.id);
-      await updateDoc(recipeRef, {
-        rating: increment(1),
-        reviewCount: increment(1),
-      });
-
-      Alert.alert("Erfolg", "Danke für Ihre Bewertung!");
-    } catch (error) {
-      console.error("Fehler beim Bewerten des Rezepts:", error.message);
-      Alert.alert("Fehler", "Das Rezept konnte nicht bewertet werden.");
-    }
   };
 
   const handleCheckIngredient = (ingredient) => {
@@ -140,7 +120,7 @@ export default function RecipeDetail() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Icon name="arrow-back" size={28} color="#3498db" />
+          <Icon name="arrow-back" size={28} color="#3498db" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Rezeptdetails</Text>
       </View>
@@ -151,8 +131,7 @@ export default function RecipeDetail() {
         )}
         <Text style={styles.title}>{recipeData.name}</Text>
         <Text style={styles.subtitle}>Schwierigkeit: {recipeData.difficulty}</Text>
-        <Text paddingBottom={20}
-         style={styles.subtitle}>
+        <Text paddingBottom={20} style={styles.subtitle}>
           Zubereitungszeit: {recipeData.timeMinutes} Minuten
         </Text>
 
@@ -171,21 +150,21 @@ export default function RecipeDetail() {
         <Text style={styles.sectionTitle}>Zutaten</Text>
 
         {recipeData.ingredients?.length > 0 ? (
-        recipeData.ingredients.map((ingredient, index) => (
-          <View key={index} style={styles.ingredientRow}>
-            <Checkbox
-              value={checkedIngredients.includes(ingredient.name)} // Nur den Namen überprüfen
-              onValueChange={() => handleCheckIngredient(ingredient.name)} // Nur den Namen verarbeiten
-              style={styles.checkbox}
-            />
-            <Text style={styles.text}>
-              {ingredient.amount} {ingredient.name}
-            </Text>
-          </View>
-        ))
-      ) : (
-        <Text style={styles.text}>Keine Zutaten verfügbar.</Text>
-      )}
+          recipeData.ingredients.map((ingredient, index) => (
+            <View key={index} style={styles.ingredientRow}>
+              <Checkbox
+                value={checkedIngredients.includes(ingredient.name)} // Nur den Namen überprüfen
+                onValueChange={() => handleCheckIngredient(ingredient.name)} // Nur den Namen verarbeiten
+                style={styles.checkbox}
+              />
+              <Text style={styles.text}>
+                {ingredient.amount} {ingredient.name}
+              </Text>
+            </View>
+          ))
+        ) : (
+          <Text style={styles.text}>Keine Zutaten verfügbar.</Text>
+        )}
 
         <Text style={styles.sectionTitle}>Anweisungen</Text>
         {recipeData.instructions?.length > 0 ? (
@@ -199,6 +178,13 @@ export default function RecipeDetail() {
         )}
 
         <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.rateButton}
+            onPress={() => navigation.navigate('timer')}
+          >
+            <Text style={styles.rateButtonText}>Timer</Text>
+          </TouchableOpacity>
+          
           <TouchableOpacity style={styles.rateButton} onPress={handleRateRecipe}>
             <Text style={styles.rateButtonText}>Rezept bewerten</Text>
           </TouchableOpacity>
@@ -282,6 +268,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#3498db",
     borderRadius: 5,
     alignItems: "center",
+    marginVertical: 10,
   },
   rateButtonText: {
     color: "#fff",
@@ -317,7 +304,3 @@ const styles = StyleSheet.create({
     padding: 16,
   },
 });
-
-
-
-

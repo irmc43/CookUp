@@ -74,7 +74,6 @@ export default function Profile() {
           })}>
         <Text  style={styles.myRecText}>Meine Favoriten</Text> 
       </TouchableOpacity>
-      
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Abmelden</Text>
       </TouchableOpacity>
