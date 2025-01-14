@@ -13,6 +13,7 @@ import { firestore } from "./firebase.config";
 import { doc, updateDoc, increment, arrayUnion, arrayRemove, getDoc } from "firebase/firestore";
 import Checkbox from "expo-checkbox";
 import Icon from "react-native-vector-icons/MaterialIcons"; 
+import { useRouter } from "expo-router";
 import { useRoute, useNavigation } from "@react-navigation/native";
 
 export default function RecipeDetail() {
@@ -26,6 +27,8 @@ export default function RecipeDetail() {
   const [favorites, setFavorites] = useState([]);
   const auth = getAuth();
   const user = auth.currentUser;
+  const router = useRouter();
+
 
   useEffect(() => {
     if (recipe) {
@@ -178,11 +181,17 @@ export default function RecipeDetail() {
         )}
 
         <View style={styles.buttonContainer}>
+          
           <TouchableOpacity
             style={styles.rateButton}
-            onPress={() => navigation.navigate('timer')}
+            onPress={() =>
+              router.push({
+                pathname: `/cook-mode`,
+                params: { recipe: JSON.stringify(recipeData) },
+              })
+            }
           >
-            <Text style={styles.rateButtonText}>Timer</Text>
+            <Text style={styles.rateButtonText}>Kochmodus</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.rateButton} onPress={handleRateRecipe}>
