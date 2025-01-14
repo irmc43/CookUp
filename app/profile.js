@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { getAuth, signOut } from "firebase/auth";
 import { useRouter } from "expo-router";
 import { app } from "./firebase.config";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 const auth = getAuth(app);
 
@@ -65,6 +66,7 @@ export default function Profile() {
           router.push({
             pathname: `/my-recipes`,
           })}>
+            <Icon name={"book"} size={20} color="#fff" style={styles.icons}/> 
         <Text  style={styles.myRecText}>Meine Rezepte</Text> 
       </TouchableOpacity>
       <TouchableOpacity style={styles.myRecButton}
@@ -72,9 +74,11 @@ export default function Profile() {
           router.push({
             pathname: `/favorites`,
           })}>
+        <Icon name={"favorite"} size={20} color="#fff" style={styles.icons}/> 
         <Text  style={styles.myRecText}>Meine Favoriten</Text> 
       </TouchableOpacity>
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+      <Icon name={"logout"} size={20} color="#fff" style={styles.icons}/> 
         <Text style={styles.logoutButtonText}>Abmelden</Text>
       </TouchableOpacity>
     </View>
@@ -84,8 +88,8 @@ export default function Profile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center", // Vertikal zentrieren
-    alignItems: "center", // Horizontal zentrieren
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   title: {
@@ -97,13 +101,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 24,
   },
+  icons: {
+    marginRight: 8,
+  },
   logoutButton: {
     padding: 12,
     backgroundColor: "#E74C3C",
     borderRadius: 5,
     alignItems: "center",
-    marginTop:10,
-    width: "80%"
+    marginTop: 30,
+    width: "80%",
+    flexDirection: "row", 
+    justifyContent: "center",
   },
   logoutButtonText: {
     color: "#fff",
@@ -115,8 +124,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#3498db",
     borderRadius: 5,
     alignItems: "center",
-    marginTop:10,
-    width: "80%"
+    marginTop: 10,
+    width: "80%",
+    flexDirection: "row", 
+    justifyContent: "center",
   },
   myRecText: {
     color: "#fff",
