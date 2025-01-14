@@ -191,7 +191,7 @@ export default function RecipeDetail() {
               })
             }
           >
-            <Text style={styles.rateButtonText}>Kochmodus</Text>
+            <Text style={styles.rateButtonText}>Jetzt nachkochen</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.rateButton} onPress={handleRateRecipe}>
