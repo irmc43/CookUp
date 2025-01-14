@@ -12,7 +12,8 @@ import { getAuth } from "firebase/auth";
 import { firestore } from "./firebase.config";
 import { doc, updateDoc, increment, arrayUnion, arrayRemove, getDoc } from "firebase/firestore";
 import Checkbox from "expo-checkbox";
-import Icon from "react-native-vector-icons/MaterialIcons"; 
+import Icon from "react-native-vector-icons/MaterialIcons";
+import Icon2 from "react-native-vector-icons/MaterialCommunityIcons";  
 import { useRouter } from "expo-router";
 import { useRoute, useNavigation } from "@react-navigation/native";
 
@@ -143,7 +144,7 @@ export default function RecipeDetail() {
             name={isFavorite ? "favorite" : "favorite-border"}
             size={20}
             color="#fff"
-            style={styles.favoriteIcon}
+            style={styles.icons}
           />
           <Text style={styles.favoriteButtonText}>
             {isFavorite ? "Aus Favoriten entfernen" : "Zu Favoriten hinzufügen"}
@@ -191,10 +192,12 @@ export default function RecipeDetail() {
               })
             }
           >
+           <Icon2 name={"chef-hat"} size={20} color="#fff" style={styles.icons}/> 
             <Text style={styles.rateButtonText}>Jetzt nachkochen</Text>
           </TouchableOpacity>
           
           <TouchableOpacity style={styles.rateButton} onPress={handleRateRecipe}>
+          <Icon2 name={"star"} size={20} color="#fff" style={styles.icons}/> 
             <Text style={styles.rateButtonText}>Rezept bewerten</Text>
           </TouchableOpacity>
         </View>
@@ -273,17 +276,20 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   rateButton: {
-    padding: 12,
+    padding: 10,
     backgroundColor: "#3498db",
     borderRadius: 5,
     alignItems: "center",
-    marginVertical: 10,
+    marginBottom: 16,
+    flexDirection: "row", 
+    justifyContent: "center",
   },
   rateButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },
+
   favoriteButton: {
     padding: 10,
     backgroundColor: "#E0115F",
@@ -293,8 +299,8 @@ const styles = StyleSheet.create({
     flexDirection: "row", 
     justifyContent: "center",
   },
-  favoriteIcon: {
-    marginRight: 8, 
+  icons: {
+    marginRight: 8,
   },
   favoriteButtonText: {
     color: "#fff",
