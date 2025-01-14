@@ -97,7 +97,13 @@ export default function Home() {
 
   // Kategorien nach Küche
   const allRecipes = [...myRecipes, ...communityRecipes];
-  const cuisines = [...new Set(allRecipes.map(recipe => recipe.cuisine))];
+  const cuisines = [
+    ...new Set(
+      allRecipes
+        .map((recipe) => recipe.cuisine)
+        .filter((cuisine) => cuisine)  // filtern von leeren/undefinierten Werten
+    ),
+  ];
 
   // Community-Rezepte
   useEffect(() => {
