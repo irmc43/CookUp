@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Slot, useSegments } from 'expo-router';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -9,6 +9,33 @@ import Icon3 from 'react-native-vector-icons/MaterialIcons';
 export default function Layout() {
   const router = useRouter();
   const segments = useSegments(); // Ermittelt die aktuelle Route
+  const [isConnected, setIsConnected] = useState(true);
+
+  // Funktion zur Überprüfung der Internetverbindung
+  const checkInternetConnection = async () => {
+    try {
+      // Anfrage an zuverlässige URL (Google)
+      await fetch('https://www.google.com', { method: 'HEAD' });
+      setIsConnected(true);
+    } catch (error) {
+      setIsConnected(false);
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(checkInternetConnection, 5000); // Alle 5 Sekunden überprüfen
+    return () => clearInterval(interval); // Intervall löschen
+  }, []);
+
+  useEffect(() => {
+    if (!isConnected) {
+      Alert.alert(
+        'Keine Internetverbindung',
+        'Es scheint, als wären Sie offline. Bitte überprüfen Sie Ihre Verbindung.',
+        [{ text: 'OK' }]
+      );
+    }
+  }, [isConnected]);
 
   // Überprüfen, ob die aktuelle Seite `login` ist
   const isLoginPage = segments[0] === "login";
@@ -17,7 +44,7 @@ export default function Layout() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.container}>
         <View style={styles.content}>
-          <Slot /> 
+          <Slot />
         </View>
 
         {!isLoginPage && (
