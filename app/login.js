@@ -71,8 +71,11 @@ const AuthScreen = ({
       </View>
 
       <View style={styles.bottomContainer}>
+      <Text style={styles.accountText}>
+          {isLogin ? "Benötigen Sie ein Konto?" : "Sie haben bereits ein Konto?"}
+        </Text>
         <Text style={styles.toggleText} onPress={() => setIsLogin(!isLogin)}>
-          {isLogin ? "Benötigen Sie ein Konto? Registrieren" : "Sie haben bereits ein Konto? Anmelden"}
+          {isLogin ? "Registrieren" : "Anmelden"}
         </Text>
       </View>
     </View>
@@ -242,11 +245,19 @@ const styles = StyleSheet.create({
     fontSize: 18, 
     fontWeight: 'bold',
   },
-  toggleText: {
+  accountText: {
     color: "#fff",
     textAlign: "center",
     fontWeight: "semibold",
     fontSize: 16,
+    marginBottom: 8,
+  },
+  toggleText: {
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "semibold",
+    fontSize: 20,
+    textDecorationLine: 'underline',
   },
   bottomContainer: {
     marginTop: 20,
