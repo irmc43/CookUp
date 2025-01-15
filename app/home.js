@@ -1,30 +1,12 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  ActivityIndicator,
-  Dimensions,
-  FlatList,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-} from "react-native";
+import { View, Text, FlatList, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Image, } from "react-native";
 import { getAuth } from "firebase/auth";
 import { ref, onValue } from "firebase/database";
-import {
-  collection,
-  getDocs,
-  doc,
-  updateDoc,
-  arrayUnion,
-  arrayRemove,
-  getDoc,
-} from "firebase/firestore";
+import { collection,getDocs, doc, updateDoc, arrayUnion, arrayRemove, getDoc, } from "firebase/firestore";
 import { db, firestore } from "./firebase.config";
 import { useRouter } from "expo-router";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { StyleSheet, Dimensions } from "react-native";
 
 const { width } = Dimensions.get("window");
 
@@ -36,6 +18,7 @@ export default function Home() {
   const [loadingCommunityRecipes, setLoadingCommunityRecipes] = useState(true);
   const [loadingUser, setLoadingUser] = useState(true);
   const [userName, setUserName] = useState("Gast");
+  const [cuisines, setCuisines] = useState([]);
 
   const router = useRouter();
   const auth = getAuth();
@@ -95,16 +78,6 @@ export default function Home() {
     );
   }, []);
 
-  // Kategorien nach Küche
-  const allRecipes = [...myRecipes, ...communityRecipes];
-  const cuisines = [
-    ...new Set(
-      allRecipes
-        .map((recipe) => recipe.cuisine)
-        .filter((cuisine) => cuisine)  // filtern von leeren/undefinierten Werten
-    ),
-  ];
-
   // Community-Rezepte
   useEffect(() => {
     const fetchCommunityRecipes = async () => {
@@ -126,6 +99,19 @@ export default function Home() {
 
     fetchCommunityRecipes();
   }, []);
+
+  // Kategorien nach Küche
+  useEffect(() => {
+    const allRecipes = [...myRecipes, ...communityRecipes];
+    const cuisines = [
+      ...new Set(
+        allRecipes
+          .map((recipe) => recipe.cuisine)
+          .filter((cuisine) => cuisine)  // Filtern von leeren/undefinierten Werten
+      ),
+    ];
+    setCuisines(cuisines);
+  }, [myRecipes, communityRecipes]);
 
   // Favoriten des Benutzers
   useEffect(() => {
@@ -166,6 +152,11 @@ export default function Home() {
       setFavorites([...favorites, recipeId]);
     }
   };
+
+  // Auf 5 Rezepte/Kategorien begrenzen 
+  const limitedMyRecipes = myRecipes.slice(0, 5);
+  const limitedCommunityRecipes = communityRecipes.slice(0, 5);
+  const limitedCuisines = cuisines.slice(0, 5);
 
   if (loadingMyRecipes || loadingCommunityRecipes || loadingUser) {
     return (
@@ -211,9 +202,9 @@ export default function Home() {
       <Text style={styles.title}>Hallo, {userName}</Text>
 
       <Text style={styles.title}>Unsere Rezepte</Text>
-      {myRecipes.length > 0 ? (
+      {limitedMyRecipes.length > 0 ? (
         <FlatList
-          data={myRecipes}
+          data={limitedMyRecipes}
           renderItem={renderRecipeItem}
           keyExtractor={(item) => item.id.toString()}
           horizontal={true}
@@ -224,13 +215,13 @@ export default function Home() {
         <Text style={styles.noRecipesText}>Keine eigenen Rezepte gefunden.</Text>
       )}
 
-<Text style={styles.title}>Kategorien</Text>
+      <Text style={styles.title}>Kategorien</Text>
       <ScrollView
         horizontal={true}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.categoriesContainer}
       >
-        {cuisines.map((cuisine, index) => (
+        {limitedCuisines.map((cuisine, index) => (
           <TouchableOpacity
             key={`${cuisine}-${index}`} // Key durch Kombination aus `cuisine` und `index`
             style={styles.categoryButton}
@@ -241,9 +232,9 @@ export default function Home() {
       </ScrollView>
 
       <Text style={styles.title}>Community-Rezepte</Text>
-      {communityRecipes.length > 0 ? (
+      {limitedCommunityRecipes.length > 0 ? (
         <FlatList
-          data={communityRecipes}
+          data={limitedCommunityRecipes}
           renderItem={renderRecipeItem}
           keyExtractor={(item) => item.id.toString()}
           horizontal={true}
