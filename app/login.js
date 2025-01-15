@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, StyleSheet, ScrollView } from "react-native";
-import { useRouter } from "expo-router";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "@firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { firestore, app } from "./firebase.config";
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet, Platform, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from '@firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { firestore, app } from './firebase.config';
+import { useFonts, DynaPuff_400Regular } from '@expo-google-fonts/dynapuff';
+import { LinearGradient } from 'expo-linear-gradient'; 
 
 const AuthScreen = ({
   email,
   setEmail,
   password,
   setPassword,
+  confirmPassword,
+  setConfirmPassword,
   username,
   setUsername,
   isLogin,
@@ -19,8 +23,6 @@ const AuthScreen = ({
 }) => {
   return (
     <View style={styles.authContainer}>
-      <Text style={styles.title}>{isLogin ? "Anmelden" : "Registrieren"}</Text>
-      
       {!isLogin && (
         <TextInput
           style={[styles.input, errorMessage ? styles.inputError : null]}
@@ -48,15 +50,24 @@ const AuthScreen = ({
         secureTextEntry
         placeholderTextColor="#929292"
       />
-      
-      {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
-      
-      <View style={styles.buttonContainer}>
-        <Button
-          title={isLogin ? "Anmelden" : "Registrieren"}
-          onPress={handleAuthentication}
-          color="#3498db"
+
+      {!isLogin && (
+        <TextInput
+          style={[styles.input, errorMessage ? styles.inputError : null]}
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          placeholder="Passwort bestätigen"
+          secureTextEntry
+          placeholderTextColor="#929292"
         />
+      )}
+
+      {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={handleAuthentication} style={styles.authButton}>
+          <Text style={styles.authButtonText}>{isLogin ? "Anmelden" : "Registrieren"}</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.bottomContainer}>
@@ -71,6 +82,7 @@ const AuthScreen = ({
 export default function App() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [username, setUsername] = useState(""); 
   const [user, setUser] = useState(null);
   const [isLogin, setIsLogin] = useState(true);
@@ -78,6 +90,10 @@ export default function App() {
   const router = useRouter();
 
   const auth = getAuth(app);
+
+  let [fontsLoaded] = useFonts({
+    DynaPuff_400Regular,
+  });
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -93,6 +109,11 @@ export default function App() {
 
   const handleAuthentication = async () => {
     setErrorMessage(""); // Fehlermeldung zu Beginn wird zurückgesetzt
+
+    if (!isLogin && password !== confirmPassword) {
+      setErrorMessage("Die Passwörter stimmen nicht überein.");
+      return;
+    }
 
     try {
       if (isLogin) {
@@ -114,49 +135,85 @@ export default function App() {
       console.error("Authentication error:", error.message);
 
       // Allgemeine Fehlermeldung für falsche Anmeldedaten
-      setErrorMessage("Die eingegebenen Anmeldedaten sind falsch. Bitte überprüfen Sie Ihre E-Mail und Ihr Passwort.");
+      setErrorMessage("Anmeldung fehlgeschlagen. Überprüfen Sie Ihre Eingaben!");
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <LinearGradient
+      colors={['#4ca7e4', '#c1dff6']}
+      style={styles.container}
+    >
       {user ? null : (
-        <AuthScreen
-          email={email}
-          setEmail={setEmail}
-          password={password}
-          setPassword={setPassword}
-          username={username}
-          setUsername={setUsername}
-          isLogin={isLogin}
-          setIsLogin={setIsLogin}
-          handleAuthentication={handleAuthentication}
-          errorMessage={errorMessage} 
-        />
+        <View style={styles.authContent}>
+          <Text style={styles.welcomeText}>Willkommen bei</Text>
+          <Text style={styles.appName}>CookUp</Text>
+
+          <AuthScreen
+            email={email}
+            setEmail={setEmail}
+            password={password}
+            setPassword={setPassword}
+            confirmPassword={confirmPassword}
+            setConfirmPassword={setConfirmPassword}
+            username={username}
+            setUsername={setUsername}
+            isLogin={isLogin}
+            setIsLogin={setIsLogin}
+            handleAuthentication={handleAuthentication}
+            errorMessage={errorMessage} 
+          />
+        </View>
       )}
-    </ScrollView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+
   container: {
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
   },
+  authContent: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    width: "100%",
+  },
   authContainer: {
     width: "80%",
     maxWidth: 400,
-    backgroundColor: "#fff",
     padding: 16,
     borderRadius: 8,
-    elevation: 3,
+    ...Platform.select({
+      ios: {
+        shadowColor: 'transparent',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0,
+        shadowRadius: 0,
+      },
+      android: {
+        elevation: 0,
+      },
+    }),
   },
-  title: {
+  welcomeText: {
     fontSize: 24,
-    marginBottom: 16,
     textAlign: "center",
+    marginTop: 78,
+    marginBottom: 10,
+    color: "#fff",
+  },
+  appName: {
+    fontSize: 48,
+    fontFamily: 'DynaPuff_400Regular',
+    fontWeight: 'bold',
+    textAlign: "center",
+    marginBottom: 70,
+    color: "#fff",
   },
   input: {
     height: 40,
@@ -165,24 +222,44 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     padding: 8,
     borderRadius: 4,
+    backgroundColor: "#fff",
   },
   inputError: {
-    borderColor: "red", 
+    borderColor: "#f24040", 
   },
   buttonContainer: {
     marginBottom: 16,
   },
+  authButton: {
+    backgroundColor: '#4ca7e4',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  authButtonText: {
+    color: '#fff',
+    fontSize: 18, 
+    fontWeight: 'bold',
+  },
   toggleText: {
-    color: "#3498db",
+    color: "#fff",
     textAlign: "center",
+    fontWeight: "semibold",
+    fontSize: 16,
   },
   bottomContainer: {
     marginTop: 20,
   },
   errorMessage: {
-    color: "red",
+    backgroundColor: "#fff",
+    color: "#f24040",
     fontSize: 16,
+    padding: 12,
+    borderRadius: 8,
     marginVertical: 10,
     textAlign: "center",
+    alignSelf: "center",
+    width: "100%",
   },
 });
