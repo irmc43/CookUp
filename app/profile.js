@@ -15,7 +15,7 @@ export default function Profile() {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
       if (!user) {
-        router.replace("/login"); // Weiterleitung zur Login-Seite, falls der Benutzer nicht eingeloggt ist
+        router.replace("/login"); // Weiterleitung zur Login-Seite
       }
     });
 
@@ -23,7 +23,6 @@ export default function Profile() {
   }, []);
 
   const handleLogout = async () => {
-    // Bestätigung vor dem Abmelden
     Alert.alert(
       "Abmelden?",
       "Möchten Sie sich wirklich abmelden?",
@@ -60,25 +59,40 @@ export default function Profile() {
     <View style={styles.container}>
       <Text style={styles.title}>Profil</Text>
       <Text style={styles.infoText}>E-Mail: {user.email}</Text>
-      
-      <TouchableOpacity style={styles.myRecButton}
+
+      <TouchableOpacity
+        style={styles.myButton}
         onPress={() =>
           router.push({
             pathname: `/my-recipes`,
-          })}>
-            <Icon name={"book"} size={20} color="#fff" style={styles.icons}/> 
-        <Text  style={styles.myRecText}>Meine Rezepte</Text> 
+          })
+        }
+      >
+        <Icon name={"book"} size={20} color="#fff" style={styles.icons} />
+        <Text style={styles.myText}>Meine Rezepte</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.myRecButton}
+      <TouchableOpacity
+        style={styles.myButton}
         onPress={() =>
           router.push({
             pathname: `/favorites`,
-          })}>
-        <Icon name={"favorite"} size={20} color="#fff" style={styles.icons}/> 
-        <Text  style={styles.myRecText}>Meine Favoriten</Text> 
+          })
+        }
+      >
+        <Icon name={"favorite"} size={20} color="#fff" style={styles.icons} />
+        <Text style={styles.myText}>Meine Favoriten</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.impButton}
+        onPress={() => router.push("/impressum")}
+      >
+        <Icon name={"info"} size={20} color="#fff" style={styles.icons} />
+        <Text style={styles.myText}>Impressum</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-      <Icon name={"logout"} size={20} color="#fff" style={styles.icons}/> 
+        <Icon name={"logout"} size={20} color="#fff" style={styles.icons} />
         <Text style={styles.logoutButtonText}>Abmelden</Text>
       </TouchableOpacity>
     </View>
@@ -111,7 +125,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 30,
     width: "80%",
-    flexDirection: "row", 
+    flexDirection: "row",
     justifyContent: "center",
   },
   logoutButtonText: {
@@ -119,19 +133,30 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  myRecButton:{
+  myButton: {
     padding: 12,
     backgroundColor: "#3498db",
     borderRadius: 5,
     alignItems: "center",
     marginTop: 10,
     width: "80%",
-    flexDirection: "row", 
+    flexDirection: "row",
     justifyContent: "center",
   },
-  myRecText: {
+  myText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },
+  impButton: {
+    padding: 12,
+    backgroundColor: "#3498db",
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop: 30,
+    width: "80%",
+    flexDirection: "row",
+    justifyContent: "center",
+  },
 });
+
