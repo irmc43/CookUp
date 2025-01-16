@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   StyleSheet,
   FlatList,
   Alert,
@@ -162,101 +161,151 @@ export default function AddRecipe() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Rezept hinzufügen</Text>
+    <FlatList
+      data={[{ id: "form" }]}
+      keyExtractor={(item) => item.id}
+      renderItem={() => (
+        <View style={styles.container}>
+          <Text style={styles.title}>Rezept hinzufügen</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Rezeptname"
-        value={name}
-        onChangeText={setName}
-      />
+          <TextInput
+            style={styles.nameInput}
+            placeholder="Rezeptname"
+            placeholderTextColor="#aaa"
+            value={name}
+            onChangeText={setName}
+          />
 
-      <Text style={styles.label}>Schwierigkeitsgrad:</Text>
-      <DropDownPicker
-        open={open}
-        value={difficulty}
-        items={items}
-        setOpen={setOpen}
-        setValue={setDifficulty}
-        style={styles.picker}
-        placeholder="Wählen Sie eine Option"
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Zubereitungszeit (Minuten)"
-        value={timeMinutes}
-        onChangeText={setTimeMinutes}
-        keyboardType="numeric"
-      />
-
-      <View style={styles.ingredientContainer}>
-        <TextInput
-          style={[styles.input, styles.amountInput]}
-          placeholder="Menge (z.B. 200g)"
-          value={ingredientAmount}
-          onChangeText={setIngredientAmount}
-        />
-        <TextInput
-          style={[styles.input, styles.ingredientInput]}
-          placeholder="Zutat (z.B. Zucker)"
-          value={ingredientName}
-          onChangeText={setIngredientName}
-        />
-      </View>
-      <Button title="Zutat hinzufügen" onPress={handleAddIngredient} />
-
-      <FlatList
-        data={ingredients}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) => (
-          <View style={styles.listItemContainer}>
-            <Text style={styles.listItem}>
-              {item.amount} {item.name}
-            </Text>
-            <TouchableOpacity onPress={() => removeIngredient(index)}>
-              <Icon name="close" size={24} color="#e74c3c" />
-            </TouchableOpacity>
+          <View style={styles.difficultyTimeWrapper}>
+            <View style={styles.difficultyTimeContainer}>
+              <View style={styles.difficultyContainer}>
+                <Text style={styles.label}>Schwierigkeit:</Text>
+                <DropDownPicker
+                  open={open}
+                  value={difficulty}
+                  items={items}
+                  setOpen={setOpen}
+                  setValue={setDifficulty}
+                  style={styles.picker}
+                  placeholder="Wählen Sie eine Option"
+                />
+              </View>
+              <View style={styles.timeContainer}>
+                <Text style={styles.label}>Zeitaufwand:</Text>
+                <TextInput
+                  style={[styles.input, styles.timeInput]}
+                  placeholder="Minuten"
+                  placeholderTextColor="#aaa"
+                  value={timeMinutes}
+                  onChangeText={setTimeMinutes}
+                  keyboardType="numeric"
+                />
+              </View>
+            </View>
           </View>
-        )}
-      />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Anweisung hinzufügen"
-        value={instructionInput}
-        onChangeText={setInstructionInput}
-      />
-      <Button title="Anweisung hinzufügen" onPress={handleAddInstruction} />
-
-      <FlatList
-        data={instructions}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) => (
-          <View style={styles.listItemContainer}>
-            <Text style={styles.listItem}>{item}</Text>
-            <TouchableOpacity onPress={() => removeInstruction(index)}>
-              <Icon name="close" size={24} color="#e74c3c" />
-            </TouchableOpacity>
+          <View style={styles.separator} />
+          <Text style={styles.sectionTitle}>Zutaten</Text>
+          <View style={styles.sectionBlock}>
+            <View style={styles.ingredientContainer}>
+              <TextInput
+                style={[styles.input, styles.amountInput]}
+                placeholder="Menge (z.B. 200g)"
+                placeholderTextColor="#aaa"
+                value={ingredientAmount}
+                onChangeText={setIngredientAmount}
+              />
+              <TextInput
+                style={[styles.input, styles.ingredientInput]}
+                placeholder="Zutat (z.B. Zucker)"
+                placeholderTextColor="#aaa"
+                value={ingredientName}
+                onChangeText={setIngredientName}
+              />
+            </View>
+            
           </View>
+          <TouchableOpacity style={styles.button} onPress={handleAddIngredient}>
+              <Icon name="add" size={20} color="white" style={styles.buttonIcon} />
+              <Text style={styles.buttonText}>Zutat hinzufügen</Text>
+          </TouchableOpacity>
+          {ingredients.map((item, index) => (
+              <View key={index} style={styles.addedBlock}>
+                <Text style={styles.ingredientText}>
+                  {item.amount} {item.name}
+                </Text>
+                <TouchableOpacity onPress={() => removeIngredient(index)}>
+                  <Icon name="close" size={24} color="#e74c3c" />
+                </TouchableOpacity>
+              </View>
+            ))}
+
+          <View style={styles.separator} />
+          <Text style={styles.sectionTitle}>Zubereitung</Text>
+          <View style={styles.sectionBlock}>
+            <TextInput
+              style={styles.input}
+              placeholder="Anweisung hinzufügen"
+              placeholderTextColor="#aaa"
+              value={instructionInput}
+              onChangeText={setInstructionInput}
+            />
+          </View>
+          <TouchableOpacity style={styles.button} onPress={handleAddInstruction}>
+              <Icon name="add" size={20} color="white" style={styles.buttonIcon} />
+              <Text style={styles.buttonText}>Anweisung hinzufügen</Text>
+          </TouchableOpacity>
+          {instructions.map((item, index) => (
+              <View key={index} style={styles.addedBlock}>
+                <Text style={styles.instructionText}>{item}</Text>
+                <TouchableOpacity onPress={() => removeInstruction(index)}>
+                  <Icon name="close" size={24} color="#e74c3c" />
+                </TouchableOpacity>
+              </View>
+            ))}
+            <View style={styles.separator} />
+          <Text style={styles.sectionTitle}>Bild hinzufügen</Text>
+          <TouchableOpacity style={styles.button} onPress={pickImage}>
+            <Icon name="image" size={20} color="white" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Bild auswählen</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.button} onPress={takePhoto}>
+            <Icon name="camera-alt" size={20} color="white" style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Foto aufnehmen</Text>
+          </TouchableOpacity>
+          
+          {imageUri && (
+            <View style={styles.imageContainer}>
+              <Image source={{ uri: imageUri }} style={styles.imagePreview} />
+              <TouchableOpacity 
+              style={styles.removeButton} 
+              onPress={() => setImageUri(null)}
+              >
+                <Icon name="delete" size={24} color="#e74c3c" />
+                <Text style={styles.removeButtonText}>Bild entfernen</Text>
+                </TouchableOpacity>
+                </View>
+              )}
+              <View style={styles.separator} />
+              
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                style={[styles.button, styles.addButton]}
+                onPress={handleAddRecipe}
+                disabled={loading}
+                >
+                  <Icon name="check-circle" size={20} color="white" style={styles.buttonIcon} />
+                  <Text style={styles.buttonText}>
+                    {loading ? "Hinzufügen..." : "Rezept hinzufügen"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+        </View>
         )}
-      />
-
-      <Button title="Bild auswählen" onPress={pickImage} />
-      <Button title="Foto aufnehmen" onPress={takePhoto} />
-
-      {imageUri && <Image source={{ uri: imageUri }} style={styles.imagePreview} />}
-
-      <Button
-        title={loading ? "Hinzufügen..." : "Rezept hinzufügen"}
-        onPress={handleAddRecipe}
-        disabled={loading}
-        color="#3498db"
-      />
-    </View>
-  );
-}
+        />
+      );
+    }
 
 const styles = StyleSheet.create({
   container: {
@@ -268,48 +317,160 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 16,
   },
-  input: {
+  nameInput: {
     width: "100%",
-    padding: 10,
-    marginBottom: 10,
+    padding: 12,
+    marginBottom: 12,
     borderWidth: 1,
     borderColor: "#ddd",
     borderRadius: 5,
     backgroundColor: "#fefefe",
   },
-  picker: {
-    marginBottom: 10,
+  input: {
+    width: "100%",
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 5,
+    backgroundColor: "#fefefe",
   },
-  listItemContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 4,
-    justifyContent: "space-between",
-  },
-  listItem: {
+  label: {
     fontSize: 16,
-    color: "#333",
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  picker: {
+    marginBottom: 12,
+    borderColor: "#ddd",
+    flex: 1,
+    width: "auto",
+    marginRight: 12,
+  },
+  timeInput: {
+    flex: 2,
+    width: "auto",
+    marginBottom: 12,
+  },
+  difficultyTimeWrapper: {
+    marginBottom: 12,
+  },
+  difficultyTimeContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+  },
+  difficultyContainer: {
+    flex: 1,
     marginRight: 8,
+  },
+  timeContainer: {
     flex: 1,
   },
-  imagePreview: {
-    width: 100,
-    height: 100,
-    marginVertical: 10,
-    borderRadius: 10,
+  separator: {
+    borderBottomWidth: 1,
+    borderColor: "#ddd",
+    marginVertical: 16,
+  },
+  sectionTitle: {
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  sectionBlock: {
+    padding: 16,
+    backgroundColor: "#f4f4f4",
+    borderRadius: 8,
+    marginBottom: 15,
   },
   ingredientContainer: {
     flexDirection: "row",
     width: "100%",
-    marginBottom: 10,
   },
   ingredientInput: {
     flex: 2,
-    marginRight: 8,
+    marginLeft: 8,
   },
   amountInput: {
     flex: 1,
+    marginRight: 8,
   },
+  block: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  listItem: {
+    fontSize: 16,
+  },
+  button: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#3498db",
+    padding: 12,
+    borderRadius: 5,
+    marginBottom: 15,
+    justifyContent: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+  },
+  buttonIcon: {
+    marginRight: 10,
+  },
+  addButton: {
+    backgroundColor: "#27ae60",
+    marginTop: 0,
+  },
+  buttonContainer: {
+    marginTop: 20,
+  },
+  imagePreview: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+    marginTop: 16,
+    marginBottom: 16,
+  },
+  ingredientText: {
+    fontSize: 16,
+  },
+  addedBlock: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+    padding: 8,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 5,
+    backgroundColor: "#f4f4f4",
+  },
+  instructionText: {
+    fontSize: 16,
+  },
+  removeButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f2f2f2",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  removeButtonText: {
+    color: "#e74c3c",
+    marginLeft: 8,
+    fontSize: 16,
+  },
+  imageContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  }, 
 });
 
 
