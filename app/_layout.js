@@ -49,7 +49,7 @@ export default function Layout() {
   return (
     <SafeAreaView
   style={isLoginPage ? styles.loginSafeArea : styles.safeArea}
-  edges={["top", "left", "right", "bottom"]} // top für Login nicht einbezogen
+  edges={isLoginPage ? ["left", "right", "bottom"] : ["top", "left", "right", "bottom"]} // top für Login nicht einbezogen
 >
 
       <View style={styles.container}>
