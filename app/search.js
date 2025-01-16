@@ -36,7 +36,10 @@ export default function SearchScreen() {
 
       let recipesList = [];
       if (snapshot.exists()) {
-        recipesList = Object.values(snapshot.val());
+        recipesList = Object.entries(snapshot.val()).map(([key, recipe]) => ({
+          id: key, // Schlüssel als ID verwenden
+          ...recipe,
+        }));
       } else {
         console.error("Keine Rezepte in der Realtime Database gefunden.");
       }
@@ -44,7 +47,7 @@ export default function SearchScreen() {
       // Community-Rezepte aus Firestore
       const communityRecipesRef = collection(firestore, "communityRecipes");
       const communitySnapshot = await getDocs(communityRecipesRef);
-      const communityRecipes = communitySnapshot.docs.map(doc => ({
+      const communityRecipes = communitySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
@@ -104,7 +107,7 @@ export default function SearchScreen() {
         value={searchQuery}
         onChangeText={handleSearch}
       />
-      
+
       {filteredRecipes.length > 0 ? (
         <FlatList
           data={filteredRecipes}
