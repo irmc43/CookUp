@@ -4,15 +4,7 @@ Mobile Computing - CookUp
 Node Version: 20.18.0
 SDK Version: 52.0.23
 
-Installierte Libraries:
-- React Navigation
-- NativeWind
-- HeroIcons
-- react-native-responsive-screen
-- expo image picker
-- expo file system
-- expo camera
-- expo media library
+---
 
 
 Anleitung lokale Installation:
