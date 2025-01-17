@@ -225,9 +225,9 @@ export default function AddRecipe() {
             </View>
             
           </View>
-          <TouchableOpacity style={styles.button} onPress={handleAddIngredient}>
-              <Icon name="add" size={20} color="white" style={styles.buttonIcon} />
-              <Text style={styles.buttonText}>Zutat hinzufügen</Text>
+          <TouchableOpacity style={styles.addButton} onPress={handleAddIngredient}>
+              <Text style={styles.addButtonText}>Zutat hinzufügen</Text>
+              <Icon name="add" size={20} style={styles.addButtonIcon} />
           </TouchableOpacity>
           {ingredients.map((item, index) => (
               <View key={index} style={styles.addedBlock}>
@@ -244,16 +244,18 @@ export default function AddRecipe() {
           <Text style={styles.sectionTitle}>Zubereitung</Text>
           <View style={styles.sectionBlock}>
             <TextInput
-              style={styles.input}
-              placeholder="Anweisung hinzufügen"
-              placeholderTextColor="#aaa"
-              value={instructionInput}
-              onChangeText={setInstructionInput}
+            style={[styles.input, styles.instructionInput]}
+            placeholder="Anweisung hinzufügen"
+            placeholderTextColor="#aaa"
+            value={instructionInput}
+            onChangeText={setInstructionInput}
+            multiline={true}
+            numberOfLines={4} 
             />
-          </View>
-          <TouchableOpacity style={styles.button} onPress={handleAddInstruction}>
-              <Icon name="add" size={20} color="white" style={styles.buttonIcon} />
-              <Text style={styles.buttonText}>Anweisung hinzufügen</Text>
+            </View>
+          <TouchableOpacity style={styles.addButton} onPress={handleAddInstruction}>
+              <Text style={styles.addButtonText}>Anweisung hinzufügen</Text>
+              <Icon name="add" size={20} style={styles.addButtonIcon} />
           </TouchableOpacity>
           {instructions.map((item, index) => (
               <View key={index} style={styles.addedBlock}>
@@ -265,15 +267,17 @@ export default function AddRecipe() {
             ))}
             <View style={styles.separator} />
           <Text style={styles.sectionTitle}>Bild hinzufügen</Text>
-          <TouchableOpacity style={styles.button} onPress={pickImage}>
-            <Icon name="image" size={20} color="white" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Bild auswählen</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.button} onPress={takePhoto}>
-            <Icon name="camera-alt" size={20} color="white" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Foto aufnehmen</Text>
-          </TouchableOpacity>
+          <View style={styles.imageButtonContainer}>
+            <TouchableOpacity style={styles.button} onPress={pickImage}>
+              <Icon name="image" size={32} color="white" style={styles.buttonIcon} />
+              <Text style={styles.buttonText}>Bild auswählen</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.button} onPress={takePhoto}>
+              <Icon name="camera-alt" size={32} color="white" style={styles.buttonIcon} />
+              <Text style={styles.buttonText}>Foto aufnehmen</Text>
+            </TouchableOpacity>
+          </View>
           
           {imageUri && (
             <View style={styles.imageContainer}>
@@ -291,12 +295,12 @@ export default function AddRecipe() {
               
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
-                style={[styles.button, styles.addButton]}
+                style={styles.addRecButton}
                 onPress={handleAddRecipe}
                 disabled={loading}
                 >
-                  <Icon name="check-circle" size={20} color="white" style={styles.buttonIcon} />
-                  <Text style={styles.buttonText}>
+                  <Icon name="check-circle" size={20} color="white" style={styles.addRecButtonIcon} />
+                  <Text style={styles.addRecButtonText}>
                     {loading ? "Hinzufügen..." : "Rezept hinzufügen"}
                   </Text>
                 </TouchableOpacity>
@@ -320,7 +324,7 @@ const styles = StyleSheet.create({
   nameInput: {
     width: "100%",
     padding: 12,
-    marginBottom: 12,
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: "#ddd",
     borderRadius: 5,
@@ -372,7 +376,7 @@ const styles = StyleSheet.create({
   separator: {
     borderBottomWidth: 1,
     borderColor: "#ddd",
-    marginVertical: 16,
+    marginVertical: 20,
   },
   sectionTitle: {
     textAlign: "center",
@@ -398,16 +402,49 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 8,
   },
-  block: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 8,
-  },
   listItem: {
     fontSize: 16,
   },
+  imageButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 10,
+  },
   button: {
+    flex: 1,
+    alignItems: "center",
+    padding: 12,
+    borderRadius: 5,
+    marginHorizontal: 5,
+    backgroundColor: "#3498db",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    marginTop: 8,
+  },
+  buttonIcon: {
+    color: "white",
+  },  
+  addButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
+    borderRadius: 5,
+    marginBottom: 15,
+    justifyContent: "flex-end"
+  },
+  addButtonText: {
+    color: "#7d7d7d",
+    fontSize: 16,
+  },
+  addButtonIcon: {
+    marginLeft: 10,
+    color: "#fff",
+    backgroundColor: "#3498db",
+    borderRadius: 5,
+  },
+  addRecButton: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#3498db",
@@ -415,17 +452,14 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 15,
     justifyContent: "center",
+    marginTop: 0,
   },
-  buttonText: {
+  addRecButtonText: {
     color: "white",
     fontSize: 16,
   },
-  buttonIcon: {
+  addRecButtonIcon: {
     marginRight: 10,
-  },
-  addButton: {
-    backgroundColor: "#27ae60",
-    marginTop: 0,
   },
   buttonContainer: {
     marginTop: 20,
@@ -454,6 +488,11 @@ const styles = StyleSheet.create({
   instructionText: {
     fontSize: 16,
   },
+  instructionInput: {
+    height: 80,
+    textAlignVertical: "top",
+    padding: 10,
+  }, 
   removeButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -470,7 +509,7 @@ const styles = StyleSheet.create({
   imageContainer: {
     alignItems: "center",
     marginBottom: 20,
-  }, 
+  },  
 });
 
 

@@ -92,7 +92,7 @@ export default function Layout() {
               onPress={() => router.push("/favorites")}
               style={styles.navButton}
             >
-              <Icon3 name="favorite" size={30} color={getIconColor("favorites")} />
+              <Icon3 name="favorite-border" size={30} color={getIconColor("favorites")} />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => router.push("/profile")}
