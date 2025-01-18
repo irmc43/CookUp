@@ -36,9 +36,6 @@ export default function Timer() {
     }
   }, [timerStarted, isTimeUp, isVibrating]);
 
-
-
-
   /* Klick auf start/stop -> rechnet die eingegebene zeit um und startet */
   const handleStartStop = () => {
     if (!inputTime || !validateTime(inputTime)) {
@@ -108,10 +105,9 @@ export default function Timer() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Stoppuhr</Text>
+      <Text style={styles.title}>Timer</Text>
       <Text style={styles.timeText}>{formatTime(time)}</Text>
 
-      {/* Eingabefeld für Zeit */}
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}

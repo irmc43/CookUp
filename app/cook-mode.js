@@ -1,11 +1,11 @@
 import React from "react";
 import {  View, Text, TouchableOpacity, StyleSheet, TextInput, Vibration, Alert, ScrollView } from "react-native";
-import { useNavigation,useRoute } from "@react-navigation/native"; // Für Navigation
+import { useNavigation,useRoute } from "@react-navigation/native"; 
 import Icon from "react-native-vector-icons/MaterialIcons"; 
 import Timer from "./timer";
 
 export default function Example() {
-  const navigation = useNavigation(); // Navigation-Hook
+  const navigation = useNavigation(); 
 
   const route = useRoute();
   const { recipe } = route.params || {};
@@ -15,7 +15,6 @@ export default function Example() {
     
     <View style={{ flex: 1 }}>
       <ScrollView >
-        {/* Zurück-Button */}
         <View style={styles.container}>
             <View style={styles.header}>
               <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
@@ -24,10 +23,8 @@ export default function Example() {
               <Text style={styles.headerTitle}>Kochmodus</Text>
             </View>
             
-            {/* Timer-Komponente */}
             <Timer />
 
-          
             {recipeData && (
               <View style={styles.recipeDetails}>
                 <Text style={styles.title}>{recipeData.name}</Text>
