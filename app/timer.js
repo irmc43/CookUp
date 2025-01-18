@@ -10,16 +10,14 @@ export default function Timer() {
   const [isVibrating, setIsVibrating] = useState(false); // Flag für Vibration
   const [timerStarted, setTimerStarted] = useState(false); // Flag, ob der Timer schon gestartet wurde
 
-
-
   useEffect(() => {
     let interval;
-    if (isRunning && time < targetTime) {
+    if (isRunning && time > 0) {  // Timer läuft, wenn Zeit größer als 0
       interval = setInterval(() => {
-        setTime(prevTime => prevTime + 1); // Zeit hochzählen
+        setTime(prevTime => prevTime - 1); // Zeit herunterzählen
       }, 1000);
-    } else if (time >= targetTime) {
-      // Wenn die Zeit erreicht ist, stoppe den Timer
+    } else if (time <= 0) {
+      // Wenn die Zeit 0 erreicht hat, stoppe den Timer
       setIsTimeUp(true);
       setIsRunning(false);
     } else {
@@ -50,7 +48,7 @@ export default function Timer() {
     if (isRunning) {
       setIsRunning(false); // Timer stoppen
     } else {
-      setTime(0); // Zeit zurücksetzen
+      setTime(timeInSeconds); // Startzeit auf Zielzeit
       setIsTimeUp(false); // Reset für abgelaufene Zeit
       setIsRunning(true); // Timer starten
       setTimerStarted(true); // Timer wurde gestartet
@@ -134,8 +132,6 @@ export default function Timer() {
           <Text style={styles.buttonText}>Zurücksetzen</Text>
         </TouchableOpacity>
       </View>
-
-      
 
       {isVibrating && (
         <TouchableOpacity style={styles.stopVibrationButton} onPress={handleStopVibration}>
