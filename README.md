@@ -43,6 +43,9 @@ Die mobile App "CookUp" bietet eine Plattform zum Suchen, Erstellen und Teilen v
 - react-native-uuid
 - react-native-vector-icons
 
+---
+**Quelle für die Standard-Rezepte:** https://dummyjson.com/docs/recipes#recipes-all
+
 
 ## 4. Anleitung zur Installation und Ausführung der App:
 1. Laden Sie die Main-Branch des Repositories als ZIP-Datei herunter.
