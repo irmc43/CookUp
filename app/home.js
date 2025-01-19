@@ -199,7 +199,7 @@ export default function Home() {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Hallo, {userName}</Text>
+      <Text style={[styles.title, styles.welcomeTitle]}>Hallo, {userName}</Text>
 
       <Text style={styles.title}>Unsere Rezepte</Text>
       {limitedMyRecipes.length > 0 ? (
@@ -259,6 +259,9 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 16,
+  },
+  welcomeTitle: {
+    fontSize: 20,
   },
   carouselContainer: {
     flexDirection: "row",
