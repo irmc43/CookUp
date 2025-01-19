@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 16,
+    textAlign: "center",
   },
   recipeItem: {
     backgroundColor: "#f5f5f5",

@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, ScrollView } from "react-native";
 export default function Impressum() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Impressum</Text>
+      <Text style={styles.title}>Impressum</Text>
 
       <Text style={styles.sectionTitle}>Entstehung der App:</Text>
       <Text style={styles.text}>
@@ -70,10 +70,10 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
   },
-  header: {
+  title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 16,
     textAlign: "center",
   },
   sectionTitle: {
