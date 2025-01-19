@@ -5,8 +5,9 @@ import {
   FlatList,
   StyleSheet,
   ActivityIndicator,
-  TouchableOpacity,
   Alert,
+  Image,
+  TouchableOpacity,
 } from "react-native";
 import { firestore, db } from "./firebase.config";
 import { doc, getDoc, updateDoc, arrayRemove, arrayUnion } from "firebase/firestore";
@@ -14,6 +15,9 @@ import { getAuth } from "firebase/auth";
 import { ref, get } from "firebase/database";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
+import { Dimensions } from "react-native";
+
+const { width } = Dimensions.get("window");
 
 export default function Favorites() {
   const [favorites, setFavorites] = useState([]);
@@ -25,8 +29,8 @@ export default function Favorites() {
   useEffect(() => {
     const currentUser = auth.currentUser;
     if (currentUser) {
-      setUserId(currentUser.uid); // Benutzer-ID holen
-      fetchFavorites(currentUser.uid); // Favoriten laden
+      setUserId(currentUser.uid);
+      fetchFavorites(currentUser.uid);
     } else {
       Alert.alert("Fehler", "Sie sind nicht angemeldet. Bitte melden Sie sich an.");
     }
@@ -35,7 +39,6 @@ export default function Favorites() {
   const fetchFavorites = async (userId) => {
     try {
       setLoading(true);
-
       const userDocRef = doc(firestore, "users", userId);
       const userDoc = await getDoc(userDocRef);
 
@@ -75,9 +78,7 @@ export default function Favorites() {
           }
         }
 
-        // Favoriten alphabetisch nach Namen
         loadedFavorites.sort((a, b) => a.name.localeCompare(b.name));
-
         setFavorites(loadedFavorites);
       } else {
         console.error("Benutzerdaten nicht gefunden.");
@@ -90,49 +91,75 @@ export default function Favorites() {
     }
   };
 
-  // Funktion, um Favoriten zu toggeln
   const toggleFavorite = async (recipeId) => {
     const user = auth.currentUser;
-
+  
     if (!user) {
       Alert.alert("Anmeldung erforderlich", "Bitte melden Sie sich an, um Favoriten zu speichern.");
       return;
     }
-
+  
     const userDocRef = doc(firestore, "users", user.uid);
-    
-    // Bestätigungsdialog vor dem Entfernen aus Favoriten
-    Alert.alert(
-      "Favorit entfernen?",
-      "Möchten Sie dieses Rezept wirklich aus Ihren Favoriten entfernen?",
-      [
-        {
-          text: "Abbrechen",
-          style: "cancel",
-        },
-        {
-          text: "Entfernen",
-          onPress: async () => {
-            // Löschen des Rezepts aus den Favoriten
-            const isFavorite = favorites.some((fav) => fav.id === recipeId);
-            
-            if (isFavorite) {
+  
+    if (favorites.some((fav) => fav.id === recipeId)) {
+      Alert.alert(
+        "Bestätigung erforderlich",
+        "Möchten Sie dieses Rezept wirklich aus den Favoriten entfernen?",
+        [
+          {
+            text: "Abbrechen",
+            style: "cancel",
+          },
+          {
+            text: "Entfernen",
+            onPress: async () => {
               await updateDoc(userDocRef, {
                 favorites: arrayRemove(recipeId),
               });
               setFavorites(favorites.filter((fav) => fav.id !== recipeId));
-            } else {
-              await updateDoc(userDocRef, {
-                favorites: arrayUnion(recipeId),
-              });
-              setFavorites([...favorites, { id: recipeId }]);
-            }
+            },
           },
-        },
-      ],
-      { cancelable: true }
-    );
+        ],
+        { cancelable: true }
+      );
+    } else {
+      await updateDoc(userDocRef, {
+        favorites: arrayUnion(recipeId),
+      });
+    }
   };
+
+  const renderRecipeItem = ({ item }) => (
+    <TouchableOpacity
+      onPress={() =>
+        router.push({
+          pathname: `/recipe-detail`,
+          params: { recipe: JSON.stringify(item) },
+        })
+      }
+    >
+      <View style={styles.carouselItem}>
+        <Image source={{ uri: item.image }} style={styles.recipeImage} />
+        <Text style={styles.recipeTitle} numberOfLines={1} ellipsizeMode="tail">
+          {item.name}
+        </Text>
+        <View style={styles.timeContainer}>
+          <Icon name="access-time" size={16} color="#555" />
+          <Text style={styles.recipeTime}>{item.timeMinutes} Minuten</Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => toggleFavorite(item.id)}
+          style={styles.favoriteIcon}
+        >
+          <Icon
+            name={favorites.some((fav) => fav.id === item.id) ? "favorite" : "favorite-border"}
+            size={24}
+            color={favorites.some((fav) => fav.id === item.id) ? "#E0115F" : "#555"}
+          />
+        </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
+  );
 
   if (loading) {
     return (
@@ -142,39 +169,22 @@ export default function Favorites() {
       </View>
     );
   }
-
-  const handlePressFavorite = (item) => {
-    router.push({
-      pathname: `/recipe-detail`,
-      params: { recipe: JSON.stringify(item) },
-    });
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Meine Favoriten</Text>
       {favorites.length > 0 ? (
         <FlatList
           data={favorites}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => handlePressFavorite(item)}>
-              <View style={styles.favoriteItem}>
-                <Text style={styles.favoriteText}>{item.name}</Text>
-                <TouchableOpacity onPress={() => toggleFavorite(item.id)}>
-                  <Icon name="favorite" size={24} color="#E0115F" />
-                </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
-          )}
+          renderItem={renderRecipeItem}
           keyExtractor={(item) => item.id.toString()}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-
+          
         />
       ) : (
         <Text>Keine Favoriten gefunden.</Text>
       )}
     </View>
   );
+  
 }
 
 const styles = StyleSheet.create({
@@ -187,21 +197,46 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 16,
   },
-  favoriteItem: {
-    padding: 10,
-    borderRadius: 8,
-    flexDirection: "row",
-    justifyContent: "space-between",
+  carouselContainer: {
+    flexDirection: "colomn",
+    justifyContent: "center",
+    marginBottom: 24,
+  },
+  carouselItem: {
+    justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#f5f5f5",
+    borderRadius: 10,
+    padding: 16,
+    marginVertical: 8,
+    
   },
-  favoriteText: {
+  recipeImage: {
+    width: "100%",
+    height: 200,
+    borderRadius: 10,
+  },
+  recipeTitle: {
     fontSize: 18,
-    color: "#333",
-    flex: 1,
+    fontWeight: "bold",
+    marginTop: 8,
   },
-  separator: {
-    height: 1,
-    backgroundColor: "#ddd",
-    marginVertical: 5,
+  recipeTime: {
+    fontSize: 16,
+    color: "#555",
+    marginLeft: 5,
+  },
+  timeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 5,
+  },
+  favoriteIcon: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 4,
   },
 });

@@ -5,8 +5,9 @@ import {
   FlatList,
   StyleSheet,
   ActivityIndicator,
-  TouchableOpacity,
   Alert,
+  TouchableOpacity,
+  Image,
 } from "react-native";
 import { firestore } from "./firebase.config";
 import { collection, query, where, getDocs } from "firebase/firestore";
@@ -14,7 +15,6 @@ import { getAuth } from "firebase/auth";
 import { useRouter } from "expo-router";
 import { deleteDoc, doc } from "firebase/firestore";
 import Icon from "react-native-vector-icons/MaterialIcons";
-
 
 export default function MyRecipes() {
   const [myRecipes, setMyRecipes] = useState([]);
@@ -97,17 +97,36 @@ export default function MyRecipes() {
         <FlatList
           data={myRecipes}
           renderItem={({ item }) => (
-          <View style={styles.recipeItem}>
-            <TouchableOpacity onPress={() => handlePressRecipe(item)} style={{ flex: 1 }}>
-              <Text style={styles.recipeText}>{item.name}</Text>
+            <TouchableOpacity onPress={() => handlePressRecipe(item)} style={styles.recipeItem}>
+              <View style={styles.recipeContent}>
+                {item.image && (
+                  <Image source={{ uri: item.image }} style={styles.recipeImage} />
+                )}
+                
+                <View style={styles.textContainer}>
+                  <Text style={styles.recipeText} numberOfLines={1} ellipsizeMode="tail">
+                    {item.name}
+                  </Text>
+
+                  {item.timeMinutes && (
+                    <View style={styles.timeContainer}>
+                      <Icon name="access-time" size={16} color="#555" />
+                      <Text style={styles.recipeTime}>{item.timeMinutes} Minuten</Text>
+                    </View>
+                  )}
+
+                </View>
+                <TouchableOpacity
+                  onPress={() => confirmDelete(item.id)}
+                  style={styles.deleteButton}
+                >
+                  <Icon name="delete" size={20} color="white" />
+                </TouchableOpacity>
+              </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => confirmDelete(item.id)} style={styles.deleteButton}>
-            <Icon name="delete" size={20} color="white" />
-            </TouchableOpacity>
-          </View>
           )}
           keyExtractor={(item) => item.id.toString()}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
+         
         />
       ) : (
         <Text>Sie haben noch keine Rezepte erstellt.</Text>
@@ -127,16 +146,37 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   recipeItem: {
-    padding: 10,
-    borderRadius: 8,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 10,
+    marginVertical: 8,
+    padding: 16,
+  },
+  recipeContent: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    
+  },
+  recipeImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    marginRight: 16,
+  },
+  textContainer: {
+    flex: 1,
   },
   recipeText: {
     fontSize: 18,
-    color: "#333",
+    fontWeight: "bold",
+  },
+  recipeTime: {
+    fontSize: 16,
+    color: "#555",
+    marginLeft: 5,
+  },
+  timeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 5,
   },
   deleteButton: {
     backgroundColor: "#E74C3C",
@@ -144,10 +184,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 7,
     borderRadius: 4,
   },
-
-  separator: {
-    height: 1,
-    backgroundColor: "#ddd",
-    marginVertical: 5,
-  },
+ 
 });
