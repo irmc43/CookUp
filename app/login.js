@@ -28,7 +28,7 @@ const AuthScreen = ({
           style={[styles.input, errorMessage ? styles.inputError : null]}
           value={username}
           onChangeText={setUsername}
-          placeholder="Benutzername"
+          placeholder="Name"
           autoCapitalize="none"
           placeholderTextColor="#929292"
         />
