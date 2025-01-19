@@ -40,7 +40,6 @@ export default function Layout() {
 
     if (Platform.OS === "ios") {
       StatusBar.setBarStyle(isLoginPage ? "light-content" : "dark-content");
-      StatusBar.setBackgroundColor("#4ca7e4"); //Stausbar Farbe für Login (iOS)
     }
   }, [isLoginPage]);
 

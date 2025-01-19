@@ -170,7 +170,7 @@ export default function RecipeDetail() {
           <Text style={styles.text}>Keine Zutaten verfügbar.</Text>
         )}
 
-        <Text style={styles.sectionTitle}>Anweisungen</Text>
+        <Text style={styles.sectionTitle}>Zubereitung</Text>
         {recipeData.instructions?.length > 0 ? (
           recipeData.instructions.map((instruction, index) => (
             <Text key={index} style={styles.text}>

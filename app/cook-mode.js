@@ -37,7 +37,7 @@ export default function Example() {
                   </Text>
                 ))}
 
-                <Text style={styles.sectionTitle}>Anweisungen</Text>
+                <Text style={styles.sectionTitle}>Zubereitung</Text>
                 {recipeData.instructions?.map((instruction, index) => (
                   <Text key={index} style={styles.text}>
                     {index + 1}. {instruction}
